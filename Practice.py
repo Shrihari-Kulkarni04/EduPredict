@@ -320,7 +320,7 @@ def create_navigation():
 
     with col_profile:
         # Handle query params so menu can be toggled/closed via links (used for outside click)
-        params = st.experimental_get_query_params()
+        params = st.query_params
         action = params.get("action", [None])[0]
         spm = params.get("show_profile_menu", [None])[0]
         if action or spm is not None:
