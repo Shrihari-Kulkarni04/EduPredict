@@ -1034,25 +1034,54 @@ else:
 
     # Left Side - Features of Product
     with col1:
-        st.title("🌟 AI Learning Platform")
-        st.subheader("Features of Product")
-        
-        features = [
-            "✅ Personalized Learning Paths",
-            "✅ Smart Study Material Recommendations",
-            "✅ Performance History & Analytics",
-            "✅ AI-Powered Exam Predictions",
-            "✅ Secure Login & User Profiles"
-        ]
-        
-        for feature in features:
-            st.write(feature)
 
+        st.markdown("""
+        <div style="padding-top:20px;">
+            <h1 style="font-size:55px; margin-bottom:10px;">
+                🎓 EduPredict
+            </h1>
+            <h3 style="color:#4B5563; margin-bottom:20px;">
+                AI-Powered Personalized Learning Platform
+            </h3>
+            <p style="font-size:20px; line-height:1.8;">
+                Track performance, predict scores, and receive
+                personalized learning recommendations based on
+                your academic progress.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("🚀 Get Started"):
+            st.session_state["page"] = "signup"
+            st.rerun()
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        col_a, col_b, col_c = st.columns(3)
+
+        with col_a:
+            st.info("📊\n\nPerformance Analytics")
+
+        with col_b:
+            st.info("🤖\n\nAI Score Prediction")
+
+        with col_c:
+            st.info("📚\n\nStudy Material")
+        
     # Right Side - Login/Signup Form
     with col2:
         st.markdown("<div class='login-box'>", unsafe_allow_html=True)
         
         if st.session_state["page"] == "login":
+            st.markdown("""
+                <div style="
+                    text-align:center;
+                    padding-bottom:15px;
+                ">
+                    <h2>🔐 Welcome Back</h2>
+                    <p>Access your personalized learning dashboard</p>
+                </div>
+                """, unsafe_allow_html=True)
             st.subheader("Login")
             username = st.text_input("User ID", placeholder="Enter User ID", key="login_username")
             password = st.text_input("Password", type="password", placeholder="Enter Password", key="login_password")
