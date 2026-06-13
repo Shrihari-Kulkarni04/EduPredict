@@ -277,6 +277,7 @@ def get_subjects_for_grade(class_grade):
         return []
 
 def display_dashboard_page():
+    
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "dashboard"
 
@@ -505,6 +506,8 @@ def display_dashboard_page():
             st.session_state["predictions"] = None
         if "last_scores_state" not in st.session_state:
             st.session_state["last_scores_state"] = None
+        else:
+            st.subheader("Student Performance Dashboard")
 
         if "subject_scores" not in st.session_state:
             st.info("Please enter your scores for each subject.")
@@ -550,6 +553,13 @@ def display_dashboard_page():
                         st.warning(f"{subject}: {prediction}")
                     else:
                         st.info(f"{subject}: {prediction}")
+
+                        if prediction < 50:
+                            st.error("Recommendation: Focus on fundamentals, revise NCERT chapters, and practice daily.")
+                        elif prediction < 70:
+                            st.warning("Recommendation: Increase practice and solve previous year questions.")
+                        else:
+                            st.success("Recommendation: Maintain consistency and attempt advanced problems.")
             
             # Display average prediction
             with col2:
@@ -558,6 +568,22 @@ def display_dashboard_page():
                     avg_prediction = round(sum(valid_predictions) / len(valid_predictions), 2)
                     st.markdown("### Overall Prediction")
                     st.metric("Average Predicted Score", f"{avg_prediction}")
+                    highest_subject = max(
+                        st.session_state["predictions"],
+                        key=lambda x: st.session_state["predictions"][x]
+                        if isinstance(st.session_state["predictions"][x], (int, float))
+                        else -1
+                    )
+
+                    st.success(f"Strongest Subject: {highest_subject}")
+                    lowest_subject = min(
+                        st.session_state["predictions"],
+                        key=lambda x: st.session_state["predictions"][x]
+                        if isinstance(st.session_state["predictions"][x], (int, float))
+                        else 999
+                    )
+
+                    st.error(f"Weakest Subject: {lowest_subject}")
                     
 # Initialize session state
 if "page" not in st.session_state:
