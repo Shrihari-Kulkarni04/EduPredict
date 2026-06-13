@@ -319,28 +319,6 @@ def create_navigation():
         st.title("EduPredict")
 
     with col_profile:
-        # Handle query params so menu can be toggled/closed via links (used for outside click)
-        params = st.query_params
-        action = params.get("action", [None])[0]
-        spm = params.get("show_profile_menu", [None])[0]
-        if action or spm is not None:
-            # Apply requested actions
-            if spm is not None:
-                st.session_state["show_profile_menu"] = str(spm) == "1" or str(spm).lower() == "true"
-            if action:
-                if action == "edit_profile":
-                    st.session_state["show_profile_editor"] = True
-                    st.session_state["show_profile_menu"] = False
-                elif action == "logout":
-                    st.session_state["page"] = "login"
-                    st.session_state.pop("current_page", None)
-                    st.session_state.pop("marks_displayed", None)
-                    st.session_state.pop("show_profile_editor", None)
-                    st.session_state.pop("username", None)
-                    st.session_state["show_profile_menu"] = False
-            # clear params and rerun to apply clean state
-            st.experimental_set_query_params()
-            st.experimental_rerun()
 
         st.markdown("", unsafe_allow_html=True)
         profile_src = get_profile_picture_src(user)
@@ -351,38 +329,33 @@ def create_navigation():
             st.session_state["show_profile_menu"] = False
 
         # Avatar button toggles the menu
-        st.markdown(
-            f"""
-            <style>
-                .avatar-btn {{ width:58px; height:58px; display:inline-block; border-radius:50%; border:2px solid #111; background-image:url('{css_profile_src}'); background-size:cover; background-position:center; }}
-            </style>
-            <a href="?show_profile_menu={int(not st.session_state.get('show_profile_menu', False))}&_ts={int(datetime.now().timestamp())}"><div class="avatar-btn" title="Profile"></div></a>
-            """,
-            unsafe_allow_html=True,
-        )
+        if st.button("👤", key="profile_avatar_btn"):
+
+            if st.session_state.get("show_profile_editor", False):
+                st.session_state["show_profile_editor"] = False
+                st.session_state["show_profile_menu"] = False
+
+            else:
+                st.session_state["show_profile_menu"] = not st.session_state.get(
+                    "show_profile_menu", False
+                )
+
+            st.rerun()
 
         # Render dropdown overlay card when menu is shown
         if st.session_state.get("show_profile_menu"):
-            ts = int(datetime.now().timestamp())
-            st.markdown(
-                f"""
-                <style>
-                    .pm-overlay {{ position: fixed; left:0; top:0; width:100%; height:100%; z-index:999; }}
-                    .pm-card {{ position: absolute; right:20px; top:70px; background:#fff; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.12); padding:8px; width:200px; }}
-                    .pm-link {{ display:block; padding:8px 10px; color:#111; text-decoration:none; font-weight:600; border-radius:6px; margin-bottom:6px; }}
-                    .pm-link:hover {{ background: rgba(0,0,0,0.03); }}
-                    .pm-logout {{ color:#c0392b; font-weight:700; }}
-                </style>
-                <div class="pm-overlay">
-                    <a href="?show_profile_menu=0&_ts={ts}" style="position:absolute; left:0; top:0; width:100%; height:100%;"></a>
-                    <div class="pm-card">
-                        <a class="pm-link" href="?action=edit_profile&show_profile_menu=0&_ts={ts}">✏️  Edit Profile</a>
-                        <a class="pm-link pm-logout" href="?action=logout&show_profile_menu=0&_ts={ts}">🚪  Logout</a>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+
+            st.markdown("---")
+
+            if st.button("✏️ Edit Profile", key="edit_profile_btn"):
+                st.session_state["show_profile_editor"] = True
+                st.session_state["show_profile_menu"] = False
+                st.rerun()
+
+            if st.button("🚪 Logout", key="logout_menu_btn"):
+                st.session_state.clear()
+                st.session_state["page"] = "login"
+                st.rerun()
     st.markdown("<br>", unsafe_allow_html=True)
     # Add spacer columns between the four main nav buttons to increase horizontal gaps
     left_space, col1, gap1, col2, gap2, col3, gap3, col4, right_space = st.columns(
