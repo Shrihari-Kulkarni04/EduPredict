@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+import base64
+import html
 import os
 load_dotenv()
 from datetime import datetime, UTC
@@ -23,6 +25,10 @@ users_collection.create_index(
     "createdAt",
     expireAfterSeconds=2592000
 )
+
+GRADE_OPTIONS = ["6", "7", "8", "9", "10", "11 Science", "11 Commerce", "12 Science", "12 Commerce"]
+MAX_PROFILE_IMAGE_BYTES = 1_000_000
+ALLOWED_PROFILE_IMAGE_TYPES = {"image/png", "image/jpeg", "image/jpg", "image/webp"}
 
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -77,6 +83,27 @@ st.markdown(
             color: black;
             text-align: center;
         }
+        .profile-summary {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 8px 0 12px;
+        }
+        .profile-summary img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #111111;
+        }
+        .profile-summary strong {
+            display: block;
+            font-size: 18px;
+        }
+        .profile-summary span {
+            color: #555555;
+            font-size: 14px;
+        }
 
         .welcome-section {
             padding: 20px;
@@ -95,17 +122,200 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-def create_navigation():
-    st.markdown("""
-        <div class="nav-container">
-            <div class="site-name">
-                AI Learning Platform
-            </div>
+def get_user_initials(user):
+    if not user:
+        return "U"
+
+    display_name = user.get("full_name") or user.get("username") or "User"
+    name_parts = display_name.split()
+    if not name_parts:
+        return "U"
+    if len(name_parts) == 1:
+        return name_parts[0][:2].upper()
+    return "".join(part[0].upper() for part in name_parts[:2])
+
+def build_default_avatar(initials):
+    safe_initials = html.escape(initials[:2] or "U")
+    svg = f"""
+        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+            <rect width="160" height="160" rx="80" fill="#111111"/>
+            <circle cx="118" cy="38" r="28" fill="#4CAF50" opacity="0.92"/>
+            <circle cx="40" cy="120" r="34" fill="#2d7ff9" opacity="0.9"/>
+            <text x="80" y="94" text-anchor="middle" font-family="Arial, sans-serif"
+                  font-size="54" font-weight="700" fill="#ffffff">{safe_initials}</text>
+        </svg>
+    """
+    encoded_svg = base64.b64encode(svg.encode("utf-8")).decode("ascii")
+    return f"data:image/svg+xml;base64,{encoded_svg}"
+
+def get_profile_picture_src(user):
+    if user and user.get("profile_pic"):
+        return user["profile_pic"]
+    return build_default_avatar(get_user_initials(user))
+
+def get_grade_options(current_grade):
+    options = GRADE_OPTIONS.copy()
+    if current_grade and current_grade not in options:
+        options.append(current_grade)
+    return options
+
+def image_to_data_uri(uploaded_file):
+    if uploaded_file is None:
+        return None
+
+    image_bytes = uploaded_file.getvalue()
+    image_type = uploaded_file.type or ""
+    if image_type not in ALLOWED_PROFILE_IMAGE_TYPES:
+        st.error("Please upload a PNG, JPG, JPEG, or WEBP profile picture.")
+        return None
+    if len(image_bytes) > MAX_PROFILE_IMAGE_BYTES:
+        st.error("Please upload a profile picture smaller than 1 MB.")
+        return None
+
+    encoded_image = base64.b64encode(image_bytes).decode("ascii")
+    return f"data:{image_type};base64,{encoded_image}"
+
+def save_profile_changes(current_user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic):
+    current_username = current_user.get("username", "")
+    clean_full_name = full_name.strip()
+    clean_username = new_username.strip()
+
+    if not clean_full_name:
+        st.error("Name cannot be empty.")
+        return
+    if not clean_username:
+        st.error("Username cannot be empty.")
+        return
+
+    if clean_username != current_username and users_collection.find_one({"username": clean_username}):
+        st.error("That username is already taken. Please choose another one.")
+        return
+
+    profile_pic = image_to_data_uri(uploaded_file)
+    if uploaded_file is not None and profile_pic is None:
+        return
+
+    update_payload = {
+        "$set": {
+            "full_name": clean_full_name,
+            "class_grade": class_grade,
+            "username": clean_username,
+        }
+    }
+
+    if profile_pic:
+        update_payload["$set"]["profile_pic"] = profile_pic
+    elif remove_profile_pic:
+        update_payload["$unset"] = {"profile_pic": ""}
+
+    result = users_collection.update_one({"username": current_username}, update_payload)
+    if result.matched_count == 0:
+        st.error("Could not find your profile to update.")
+        return
+
+    st.session_state["username"] = clean_username
+    if class_grade != current_user.get("class_grade"):
+        st.session_state.pop("predictions", None)
+        st.session_state.pop("last_scores_state", None)
+
+    st.session_state["profile_update_success"] = True
+    st.rerun()
+
+def render_profile_editor(user):
+    if not user:
+        st.error("User profile could not be loaded.")
+        return
+
+    if st.session_state.pop("profile_update_success", False):
+        st.success("Profile updated successfully.")
+
+    profile_src = html.escape(get_profile_picture_src(user), quote=True)
+    safe_name = html.escape(user.get("full_name", "User"))
+    safe_username = html.escape(user.get("username", ""))
+    safe_class = html.escape(user.get("class_grade", ""))
+
+    st.markdown(
+        f"""
+        <div class="profile-summary">
+            <img src="{profile_src}" alt="Profile picture">
+            <div>
+                <strong>{safe_name}</strong>
+                <span>Class {safe_class} | @{safe_username}</span>
             </div>
         </div>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
 
-    # Hidden buttons for state management
+    grade_options = get_grade_options(user.get("class_grade", ""))
+    current_grade_index = grade_options.index(user.get("class_grade", "")) if user.get("class_grade", "") in grade_options else 0
+
+    with st.form("profile_edit_form"):
+        full_name = st.text_input("Name", value=user.get("full_name", ""), key="profile_full_name")
+        class_grade = st.selectbox("Class", grade_options, index=current_grade_index, key="profile_class")
+        new_username = st.text_input("Username", value=user.get("username", ""), key="profile_username")
+        uploaded_file = st.file_uploader(
+            "Profile picture",
+            type=["png", "jpg", "jpeg", "webp"],
+            key="profile_picture_upload"
+        )
+        remove_profile_pic = st.checkbox(
+            "Remove current profile picture",
+            value=False,
+            disabled=not user.get("profile_pic"),
+            key="remove_profile_picture"
+        )
+        submitted = st.form_submit_button("Save Profile")
+
+    if submitted:
+        save_profile_changes(user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic)
+
+def create_navigation():
+    user = users_collection.find_one(
+        {"username": st.session_state.get("username", "")}
+    )
+
+    col_title, col_profile = st.columns([8, 2])
+
+    with col_title:
+        st.title("EduPredict")
+
+    with col_profile:
+        profile_src = get_profile_picture_src(user)
+        css_profile_src = profile_src.replace("\\", "\\\\").replace('"', '\\"')
+        st.markdown(
+            f"""
+            <style>
+                .st-key-profile_toggle {{
+                    display: flex;
+                    justify-content: flex-end;
+                    margin-top: 10px;
+                }}
+                .st-key-profile_toggle button {{
+                    width: 58px !important;
+                    min-width: 58px !important;
+                    height: 58px !important;
+                    padding: 0 !important;
+                    border-radius: 50% !important;
+                    border: 2px solid #111111 !important;
+                    background-image: url("{css_profile_src}") !important;
+                    background-position: center !important;
+                    background-size: cover !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+                }}
+                .st-key-profile_toggle button p {{
+                    font-size: 0 !important;
+                }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        if st.button("Profile", key="profile_toggle", help="Open profile"):
+            st.session_state["show_profile_editor"] = not st.session_state.get("show_profile_editor", False)
+
+    if st.session_state.get("show_profile_editor", False):
+        render_profile_editor(user)
+
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         if st.button("Performance History", key="nav_performance"):
@@ -124,6 +334,8 @@ def create_navigation():
             st.session_state["page"] = "login"
             st.session_state.pop("current_page", None)
             st.session_state.pop("marks_displayed", None)
+            st.session_state.pop("show_profile_editor", None)
+            st.session_state.pop("username", None)
             st.rerun()
 
 def display_dashboard(username):
@@ -641,7 +853,7 @@ else:
         elif st.session_state["page"] == "signup":
             st.subheader("Sign Up")
             full_name = st.text_input("Full Name", placeholder="Enter Full Name", key="signup_full_name")
-            class_grade = st.selectbox("Class/Grade", ["6", "7", "8", "9", "10", "11 Science", "11 Commerce", "12 Science", "12 Commerce"], key="signup_class")
+            class_grade = st.selectbox("Class/Grade", GRADE_OPTIONS, key="signup_class")
             username = st.text_input("User ID", placeholder="Enter User ID", key="signup_username")
             password = st.text_input("Create Password", type="password", placeholder="Enter Password", key="signup_password")
             confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm Password", key="signup_confirm_password")
