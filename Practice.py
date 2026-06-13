@@ -1051,7 +1051,11 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("🚀 Get Started"):
+        if st.button(
+            "🚀 Start Learning Today",
+            key="hero_get_started",
+            use_container_width=True
+        ):
             st.session_state["page"] = "signup"
             st.rerun()
 
@@ -1060,85 +1064,173 @@ else:
         col_a, col_b, col_c = st.columns(3)
 
         with col_a:
-            st.info("📊\n\nPerformance Analytics")
+            st.markdown("""
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:10px;
+                border:1px solid #e5e7eb;
+                height:200px;
+            ">
+                <h3>📊 Performance Analytics</h3>
+                <p>Track academic progress and monitor performance trends.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
         with col_b:
-            st.info("🤖\n\nAI Score Prediction")
+            st.markdown("""
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:10px;
+                border:1px solid #e5e7eb;
+                height:200px;
+            ">
+                <h3>🤖 AI Score Prediction</h3>
+                <p>Predict future scores using AI-powered analysis.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
         with col_c:
-            st.info("📚\n\nStudy Material")
-        
+            st.markdown("""
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:10px;
+                border:1px solid #e5e7eb;
+                height:200px;
+            ">
+                <h3>📚 Study Material</h3>
+                <p>Access class-wise learning resources and materials.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+
+        st.markdown("### Trusted Learning Insights")
+        st.caption("Helping students track progress and improve performance.")
+
+
+        stat1, stat2, stat3, stat4 = st.columns(4)
+
+        with stat1:
+            st.metric("📚 Resources", "500+")
+
+        with stat2:
+            st.metric("🤖 Predictions", "1000+")
+
+        with stat3:
+            st.metric("🎓 Students", "100+")
+
+        with stat4:
+            st.metric("📈 Accuracy", "85%")
+
     # Right Side - Login/Signup Form
     with col2:
-        st.markdown("<div class='login-box'>", unsafe_allow_html=True)
+        st.markdown("""
+        <style>
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        st.markdown("""
         
-        if st.session_state["page"] == "login":
-            st.markdown("""
-                <div style="
-                    text-align:center;
-                    padding-bottom:15px;
-                ">
-                    <h2>🔐 Welcome Back</h2>
-                    <p>Access your personalized learning dashboard</p>
-                </div>
-                """, unsafe_allow_html=True)
-            st.subheader("Login")
-            username = st.text_input("User ID", placeholder="Enter User ID", key="login_username")
-            password = st.text_input("Password", type="password", placeholder="Enter Password", key="login_password")
-            
-            col_login, col_signup = st.columns([1, 1])
-            
-            with col_login:
-                if st.button("Login"):
-                    user = users_collection.find_one({"username": username})
-                    if user and verify_password(password, user['password']):
-                        st.session_state["page"] = "dashboard"
-                        st.session_state["username"] = username
+        """, unsafe_allow_html=True)
+
+        card = st.container(border=True)
+
+        with card:
+        
+            if st.session_state["page"] == "login":
+                st.markdown("""
+                    <div style="
+                        text-align:center;
+                        padding-bottom:15px;
+                    ">
+                        <h2>🔐 Welcome Back</h2>
+                        <p>Access your personalized learning dashboard</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                st.markdown("### Login")
+                username = st.text_input("User ID", placeholder="Enter User ID", key="login_username")
+                password = st.text_input("Password", type="password", placeholder="Enter Password", key="login_password")
+                
+                col_login, col_signup = st.columns([1,1], gap="large")
+                
+                with col_login:
+                    if st.button("Login"):
+                        user = users_collection.find_one({"username": username})
+                        if user and verify_password(password, user['password']):
+                            st.session_state["page"] = "dashboard"
+                            st.session_state["username"] = username
+                            st.rerun()
+                        else:
+                            st.error("Invalid User ID or Password.")
+                
+                with col_signup:
+                    if st.button("Sign Up"):
+                        st.session_state["page"] = "signup"
                         st.rerun()
-                    else:
-                        st.error("Invalid User ID or Password.")
-            
-            with col_signup:
-                if st.button("Sign Up"):
-                    st.session_state["page"] = "signup"
-                    st.rerun()
-        elif st.session_state["page"] == "signup":
+            elif st.session_state["page"] == "signup":
 
-            st.subheader("Sign Up")
+                st.subheader("Sign Up")
 
-            full_name = st.text_input("Full Name")
-            username = st.text_input("Username")
-            class_grade = st.selectbox("Class", GRADE_OPTIONS)
-            password = st.text_input("Password", type="password")
-            confirm_password = st.text_input("Confirm Password", type="password")
+                full_name = st.text_input("Full Name")
+                username = st.text_input("Username")
+                class_grade = st.selectbox("Class", GRADE_OPTIONS)
+                password = st.text_input("Password", type="password")
+                confirm_password = st.text_input("Confirm Password", type="password")
 
-            if password != confirm_password:
-                st.error("Passwords do not match.")
-            col_create, col_back = st.columns(2)
+                if password != confirm_password:
+                    st.error("Passwords do not match.")
+                col_create, col_back = st.columns(2)
 
-            with col_create:
-                if st.button("Create Account"):
+                with col_create:
+                    if st.button("Create Account"):
 
-                    if users_collection.find_one({"username": username}):
-                        st.error("Username already exists.")
+                        if users_collection.find_one({"username": username}):
+                            st.error("Username already exists.")
 
-                    else:
-                        users_collection.insert_one({
-                            "full_name": full_name,
-                            "username": username,
-                            "class_grade": class_grade,
-                            "password": hash_password(password),
-                            "createdAt": datetime.now(UTC)
-                        })
+                        else:
+                            users_collection.insert_one({
+                                "full_name": full_name,
+                                "username": username,
+                                "class_grade": class_grade,
+                                "password": hash_password(password),
+                                "createdAt": datetime.now(UTC)
+                            })
 
-                        st.success("Account created successfully!")
+                            st.success("Account created successfully!")
 
-                        st.session_state["username"] = username
-                        st.session_state["page"] = "dashboard"
+                            st.session_state["username"] = username
+                            st.session_state["page"] = "dashboard"
 
+                            st.rerun()
+
+                with col_back:
+                    if st.button("Back to Login"):
+                        st.session_state["page"] = "login"
                         st.rerun()
+            
+    st.markdown("---")
 
-            with col_back:
-                if st.button("Back to Login"):
-                    st.session_state["page"] = "login"
-                    st.rerun()
+    st.markdown("""
+        <div style="text-align:center; padding:20px; color:#6b7280;">
+            <h4>EduPredict © 2026</h4>
+            <p style="margin-top:15px; font-size:14px;">
+                Developed by <b><I>Shrihari H Kulkarni</b></I>
+            </p>
+            <p>
+                AI-Powered Personalized Learning Platform
+            </p>
+            <p>
+                Built with Python • Streamlit • MongoDB • TensorFlow
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
