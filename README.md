@@ -1,26 +1,65 @@
-# EduPredict
+# 🎓 EduPredict
 
-EduPredict is an AI-driven personalized education platform designed to help students monitor their academic performance, track subject-wise progress, and predict future scores using machine learning. The system aims to address the limitations of the traditional one-size-fits-all learning approach by providing data-driven insights into student performance.
+**AI-Powered Personalized Learning Platform**
 
-The platform allows students to create secure accounts, maintain their academic records, visualize performance history through interactive charts, and access class-specific study materials. Using TensorFlow and Keras-based prediction models, EduPredict analyzes previous marks to estimate future academic performance and help students identify areas that require improvement.
+EduPredict is an intelligent educational platform designed to help students track their academic performance, predict future scores, and receive personalized learning recommendations. The platform combines data analytics, machine learning, and an interactive dashboard to create a smarter learning experience.
 
-## Key Features
+---
 
-* Secure User Authentication
-* Student Performance Tracking
-* Subject-wise Marks Management
-* Interactive Data Visualization
-* AI-Based Score Prediction
-* Personalized Learning Insights
-* Class-Specific Study Material Access
-* MongoDB Atlas Cloud Database Integration
-* Automated Data Expiry using TTL Indexes
+## 🚀 Features
 
-## Technology Stack
+### 🔐 User Authentication
+
+* Secure Login & Signup System
+* Password Encryption
+* User Profile Management
+* Profile Picture Support
+
+### 📊 Performance Analytics
+
+* Subject-wise Score Tracking
+* Academic Performance Visualization
+* Strongest Subject Identification
+* Focus Area Detection
+* Average Score Analysis
+
+### 🤖 AI Score Prediction
+
+* Machine Learning-based Score Prediction
+* Subject-wise Future Performance Estimation
+* Personalized Academic Insights
+
+### 📚 Personalized Learning Support
+
+* Class-wise Subject Management
+* Smart Recommendations Based on Performance
+* Study Material Access
+
+### 👤 Profile Management
+
+* Editable User Information
+* Username Management
+* Class Selection
+* Profile Avatar Support
+
+### 📈 Dashboard Features
+
+* Interactive Navigation Bar
+* Welcome Dashboard
+* Performance History Section
+* AI Prediction Section
+* Study Material Section
+* User Profile Section
+
+---
+
+## 🛠️ Technology Stack
 
 ### Frontend
 
 * Streamlit
+* HTML
+* CSS
 
 ### Backend
 
@@ -28,28 +67,82 @@ The platform allows students to create secure accounts, maintain their academic 
 
 ### Database
 
-* MongoDB Atlas
+* MongoDB
 
 ### Machine Learning
 
-* TensorFlow
-* Keras
+* Scikit-Learn
 * NumPy
 * Pandas
 
-### Visualization
+### Authentication & Security
 
-* Plotly
+* Password Hashing
+* Session Management
 
-## Project Objective
+---
 
-The primary objective of EduPredict is to support students with personalized academic guidance by leveraging artificial intelligence and data analytics. The platform helps students understand their learning progress, predict future outcomes, and make informed decisions to improve academic performance.
+## 🎯 Key Objectives
 
-## Future Enhancements
+* Help students monitor academic progress.
+* Predict future examination performance.
+* Identify strengths and weaknesses.
+* Provide personalized educational guidance.
+* Improve learning outcomes using AI.
 
-* Personalized Study Recommendations
-* Attendance-Based Performance Analysis
-* Teacher/Admin Dashboard
-* Advanced Predictive Models
-* Learning Analytics and Insights
-* Mobile Application Support
+---
+
+## 📂 Project Modules
+
+### 1. Authentication Module
+
+Handles user registration, login, profile management, and session handling.
+
+### 2. Performance Tracking Module
+
+Stores and analyzes subject-wise academic records.
+
+### 3. Prediction Engine
+
+Uses machine learning algorithms to predict future scores based on previous performance.
+
+### 4. Recommendation System
+
+Provides guidance and learning suggestions based on user performance.
+
+### 5. Dashboard Module
+
+Offers a centralized interface for analytics, predictions, and profile management.
+
+---
+
+## 🎨 User Interface Highlights
+
+* Modern Landing Page
+* Professional Dashboard Layout
+* Feature Cards
+* Performance Metrics
+* Responsive Navigation System
+* Personalized Welcome Experience
+
+---
+
+## 🔮 Future Enhancements
+
+* PDF Progress Reports
+* Advanced Recommendation Engine
+* Email Notifications
+* Admin Dashboard
+* Performance Leaderboards
+* Enhanced AI Models
+* Learning Path Generation
+
+---
+
+## 👨‍💻 Developer
+
+**Shrihari H Kulkarni**
+
+EduPredict © 2026
+
+*"Learn Smarter. Predict Better."*
