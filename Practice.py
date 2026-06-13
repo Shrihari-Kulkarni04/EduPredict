@@ -677,6 +677,54 @@ def display_dashboard_page():
     elif st.session_state["current_page"] == "performance":
         st.title("Performance History")
         
+        user = users_collection.find_one(
+            {"username": st.session_state.get("username", "")}
+        )
+
+       
+        all_scores = {
+            subject: sum(scores) / len(scores)
+            for subject, scores in st.session_state.get("subject_scores", {}).items()
+            if scores
+        }
+
+        if all_scores:
+
+            st.markdown(f"""
+            ### 👋 Welcome Back, {user['full_name']}!
+            Track your academic progress and identify areas for improvement.
+            """)
+
+            best_subject = max(all_scores, key=all_scores.get)
+            weak_subject = min(all_scores, key=all_scores.get)
+            avg_score = round(sum(all_scores.values()) / len(all_scores), 2)
+
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.success(f"🏆 Strongest Subject: {best_subject}")
+
+            with col2:
+                st.warning(f"⚠️ Focus Area: {weak_subject}")
+
+            with col3:
+                st.info(f"📈 Average Score: {avg_score}")
+
+        else:
+
+            st.markdown(f"""
+            ### 🌟 Welcome to EduPredict, {user['full_name']}!
+
+            We're excited to have you here.
+
+            📚 Add your first scores to unlock:
+            • Performance Tracking
+            • AI Predictions
+            • Analytics Dashboard
+
+            🚀 Start by clicking **Add Score** below.
+            """)
+            
         # Get user's class grade
         user = users_collection.find_one({"username": st.session_state.get("username", "")})
         if user:
@@ -970,6 +1018,8 @@ def display_dashboard_page():
         # Ensure subject_scores available
         subject_scores = st.session_state.get("subject_scores", {})
         render_analytics_page(subject_scores)
+    else:
+        st.info("📚 No performance data available yet. Start entering scores to view insights.")
                     
 # Initialize session state
 if "page" not in st.session_state:
@@ -1022,4 +1072,44 @@ else:
             with col_signup:
                 if st.button("Sign Up"):
                     st.session_state["page"] = "signup"
+                    st.rerun()
+        elif st.session_state["page"] == "signup":
+
+            st.subheader("Sign Up")
+
+            full_name = st.text_input("Full Name")
+            username = st.text_input("Username")
+            class_grade = st.selectbox("Class", GRADE_OPTIONS)
+            password = st.text_input("Password", type="password")
+            confirm_password = st.text_input("Confirm Password", type="password")
+
+            if password != confirm_password:
+                st.error("Passwords do not match.")
+            col_create, col_back = st.columns(2)
+
+            with col_create:
+                if st.button("Create Account"):
+
+                    if users_collection.find_one({"username": username}):
+                        st.error("Username already exists.")
+
+                    else:
+                        users_collection.insert_one({
+                            "full_name": full_name,
+                            "username": username,
+                            "class_grade": class_grade,
+                            "password": hash_password(password),
+                            "createdAt": datetime.now(UTC)
+                        })
+
+                        st.success("Account created successfully!")
+
+                        st.session_state["username"] = username
+                        st.session_state["page"] = "dashboard"
+
+                        st.rerun()
+
+            with col_back:
+                if st.button("Back to Login"):
+                    st.session_state["page"] = "login"
                     st.rerun()
