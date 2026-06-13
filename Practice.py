@@ -175,6 +175,11 @@ def image_to_data_uri(uploaded_file):
     encoded_image = base64.b64encode(image_bytes).decode("ascii")
     return f"data:{image_type};base64,{encoded_image}"
 
+
+def show_username_taken_modal(username):
+    # Simple non-modal notification to avoid compatibility issues across Streamlit versions
+    st.error(f"The username '{username}' is already taken. Please choose another one.")
+
 def save_profile_changes(current_user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic):
     current_username = current_user.get("username", "")
     clean_full_name = full_name.strip()
@@ -188,7 +193,7 @@ def save_profile_changes(current_user, full_name, class_grade, new_username, upl
         return
 
     if clean_username != current_username and users_collection.find_one({"username": clean_username}):
-        st.error("That username is already taken. Please choose another one.")
+        show_username_taken_modal(clean_username)
         return
 
     profile_pic = image_to_data_uri(uploaded_file)
@@ -251,9 +256,31 @@ def render_profile_editor(user):
     current_grade_index = grade_options.index(user.get("class_grade", "")) if user.get("class_grade", "") in grade_options else 0
 
     with st.form("profile_edit_form"):
-        full_name = st.text_input("Name", value=user.get("full_name", ""), key="profile_full_name")
-        class_grade = st.selectbox("Class", grade_options, index=current_grade_index, key="profile_class")
-        new_username = st.text_input("Username", value=user.get("username", ""), key="profile_username")
+        col1, col2 = st.columns([5, 10])
+        with col1:
+            st.markdown("**Name**")
+            st.markdown("**Class**")
+            st.markdown("**Username**")
+
+        with col2:
+            full_name = st.text_input(
+                "",
+                value=user.get("full_name", ""),
+                key="profile_full_name"
+            )
+
+            class_grade = st.selectbox(
+                "",
+                grade_options,
+                index=current_grade_index,
+                key="profile_class"
+            )
+
+            new_username = st.text_input(
+                "",
+                value=user.get("username", ""),
+                key="profile_username"
+            )
         uploaded_file = st.file_uploader(
             "Profile picture",
             type=["png", "jpg", "jpeg", "webp"],
@@ -270,18 +297,29 @@ def render_profile_editor(user):
     if submitted:
         save_profile_changes(user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic)
 
+    st.markdown("<hr>", unsafe_allow_html=True)
+    # Move Logout into the profile settings panel
+    if st.button("Logout", key="profile_logout"):
+        st.session_state["page"] = "login"
+        st.session_state.pop("current_page", None)
+        st.session_state.pop("marks_displayed", None)
+        st.session_state.pop("show_profile_editor", None)
+        st.session_state.pop("username", None)
+        st.rerun()
+
 def create_navigation():
 
     user = users_collection.find_one(
         {"username": st.session_state.get("username", "")}
     )
 
-    col_title, col_profile = st.columns([12, 2])
+    col_title, col_profile = st.columns([9, 1])
 
     with col_title:
         st.title("EduPredict")
 
     with col_profile:
+        st.markdown("", unsafe_allow_html=True)
         profile_src = get_profile_picture_src(user)
         css_profile_src = profile_src.replace("\\", "\\\\").replace('"', '\\"')
         st.markdown(
@@ -311,13 +349,25 @@ def create_navigation():
             """,
             unsafe_allow_html=True
         )
+
         if st.button("Profile", key="profile_toggle", help="Open profile"):
             st.session_state["show_profile_editor"] = not st.session_state.get("show_profile_editor", False)
-
-        if st.session_state.get("show_profile_editor", False):
-            render_profile_editor(user)
-
-    left_space, col1, col2, col3, col4 = st.columns([1,4,4,4,4])
+            st.markdown(
+            """
+            <style>
+            hr {
+                margin-top: 5px !important;
+                margin-bottom: 5px !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Add spacer columns between the four main nav buttons to increase horizontal gaps
+    left_space, col1, gap1, col2, gap2, col3, gap3, col4, right_space = st.columns(
+        [2, 3, 1.5, 3, 1.5, 3, 1.5, 3, 2]
+    )
     with col1:
         if st.button("Performance History", key="nav_performance"):
             st.session_state["current_page"] = "performance"
@@ -331,12 +381,8 @@ def create_navigation():
             st.session_state["current_page"] = "predictor"
             st.rerun()
     with col4:
-        if st.button("Logout", key="nav_logout"):
-            st.session_state["page"] = "login"
-            st.session_state.pop("current_page", None)
-            st.session_state.pop("marks_displayed", None)
-            st.session_state.pop("show_profile_editor", None)
-            st.session_state.pop("username", None)
+        if st.button("Analytics Dashboard", key="nav_analytics"):
+            st.session_state["current_page"] = "analytics"
             st.rerun()
 
 def display_dashboard(username):
@@ -489,7 +535,128 @@ def get_subjects_for_grade(class_grade):
     else:
         return []
 
+
+def compute_analytics(subject_scores):
+    # Flatten all scores and compute metrics
+    if not subject_scores:
+        return None
+
+    subject_averages = {}
+    all_scores = []
+    for subject, scores in subject_scores.items():
+        if scores and len(scores) > 0:
+            avg = sum(scores) / len(scores)
+            subject_averages[subject] = round(avg, 2)
+            all_scores.extend(scores)
+        else:
+            subject_averages[subject] = 0.0
+
+    if not all_scores:
+        return None
+
+    average_score = round(sum(all_scores) / len(all_scores), 2)
+    strongest_subject = max(subject_averages, key=lambda s: subject_averages[s])
+    weakest_subject = min(subject_averages, key=lambda s: subject_averages[s])
+    total_subjects = len(subject_averages)
+    highest_score = max(all_scores)
+    lowest_score = min(all_scores)
+    subjects_needing_improvement = [s for s, a in subject_averages.items() if a < 75]
+
+    return {
+        "average_score": average_score,
+        "strongest_subject": strongest_subject,
+        "weakest_subject": weakest_subject,
+        "total_subjects": total_subjects,
+        "highest_score": highest_score,
+        "lowest_score": lowest_score,
+        "subject_averages": subject_averages,
+        "subjects_needing_improvement": subjects_needing_improvement,
+    }
+
+
+def build_subject_avg_bar_chart(subject_averages):
+    subjects = list(subject_averages.keys())
+    averages = [subject_averages[s] for s in subjects]
+    fig = go.Figure(go.Bar(x=subjects, y=averages, marker_color='rgb(55, 83, 109)'))
+    fig.update_layout(
+        title_text='Subject-wise Average Score',
+        xaxis_title='Subjects',
+        yaxis_title='Average Score',
+        yaxis=dict(range=[0, 100]),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
+    )
+    return fig
+
+
+def build_performance_trend_line_chart(subject_scores):
+    fig = go.Figure()
+    for subject, scores in subject_scores.items():
+        if scores:
+            x = list(range(1, len(scores) + 1))
+            fig.add_trace(go.Scatter(x=x, y=scores, mode='lines+markers', name=subject))
+    fig.update_layout(
+        title_text='Performance Trend by Entry (per Subject)',
+        xaxis_title='Entry Number',
+        yaxis_title='Score',
+        yaxis=dict(range=[0, 100]),
+        legend_title='Subject',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
+    )
+    return fig
+
+
+def build_score_distribution_pie_chart(subject_averages):
+    labels = list(subject_averages.keys())
+    values = [max(0.01, v) for v in subject_averages.values()]
+    fig = go.Figure(go.Pie(labels=labels, values=values, hole=0.35))
+    fig.update_layout(title_text='Score Distribution (by Subject Average)', paper_bgcolor='rgba(0,0,0,0)')
+    return fig
+
+
+def render_analytics_page(subject_scores):
+    analytics = compute_analytics(subject_scores)
+    if analytics is None:
+        st.info("No performance data available.")
+        return
+
+    # Top row KPI cards
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Average Score", f"{analytics['average_score']}")
+    k2.metric("Strongest Subject", analytics['strongest_subject'])
+    k3.metric("Weakest Subject", analytics['weakest_subject'])
+    k4.metric("Total Subjects", analytics['total_subjects'])
+
+    # Middle row charts
+    c1, c2 = st.columns([2, 3])
+    with c1:
+        fig_bar = build_subject_avg_bar_chart(analytics['subject_averages'])
+        st.plotly_chart(fig_bar, use_container_width=True)
+    with c2:
+        fig_line = build_performance_trend_line_chart(subject_scores)
+        st.plotly_chart(fig_line, use_container_width=True)
+
+    # Bottom row insights and pie chart
+    b1, b2 = st.columns([3, 2])
+    with b1:
+        st.subheader("Insights")
+        st.write(f"**Highest Score Achieved:** {analytics['highest_score']}")
+        st.write(f"**Lowest Score Achieved:** {analytics['lowest_score']}")
+        st.write(f"**Strongest Subject:** {analytics['strongest_subject']}")
+        st.write(f"**Weakest Subject:** {analytics['weakest_subject']}")
+        if analytics['subjects_needing_improvement']:
+            st.warning("Subjects Needing Improvement (avg < 75): " + ", ".join(analytics['subjects_needing_improvement']))
+        else:
+            st.success("No subjects need immediate improvement (all averages >= 75).")
+    with b2:
+        fig_pie = build_score_distribution_pie_chart(analytics['subject_averages'])
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+
 def display_dashboard_page():
+
+    
     
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "dashboard"
@@ -498,6 +665,14 @@ def display_dashboard_page():
     create_navigation()
     
     st.markdown("<hr>", unsafe_allow_html=True)
+
+    user = users_collection.find_one(
+        {"username": st.session_state.get("username", "")}
+    )
+
+    if st.session_state.get("show_profile_editor", False):
+        render_profile_editor(user)
+        st.markdown("<hr>", unsafe_allow_html=True)
 
     # Load scores from MongoDB when initializing
     if "subject_scores" not in st.session_state:
@@ -797,6 +972,11 @@ def display_dashboard_page():
                     )
 
                     st.error(f"Weakest Subject: {lowest_subject}")
+    elif st.session_state["current_page"] == "analytics":
+        st.title("Analytics Dashboard")
+        # Ensure subject_scores available
+        subject_scores = st.session_state.get("subject_scores", {})
+        render_analytics_page(subject_scores)
                     
 # Initialize session state
 if "page" not in st.session_state:
@@ -850,36 +1030,3 @@ else:
                 if st.button("Sign Up"):
                     st.session_state["page"] = "signup"
                     st.rerun()
-        
-        elif st.session_state["page"] == "signup":
-            st.subheader("Sign Up")
-            full_name = st.text_input("Full Name", placeholder="Enter Full Name", key="signup_full_name")
-            class_grade = st.selectbox("Class/Grade", GRADE_OPTIONS, key="signup_class")
-            username = st.text_input("User ID", placeholder="Enter User ID", key="signup_username")
-            password = st.text_input("Create Password", type="password", placeholder="Enter Password", key="signup_password")
-            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm Password", key="signup_confirm_password")
-            
-            if st.button("Create Account"):
-                if password == confirm_password:
-                    if users_collection.find_one({"username": username}):
-                        st.error("User ID already exists. Choose a different one.")
-                    else:
-                        hashed_password = hash_password(password)
-                        users_collection.insert_one({
-                            "full_name": full_name,
-                            "class_grade": class_grade,
-                            "username": username,
-                            "password": hashed_password,
-                            "createdAt": datetime.now(UTC)
-                        })
-                        st.success("Account created successfully! Please log in.")
-                        st.session_state["page"] = "login"
-                        st.rerun()
-                else:
-                    st.error("Passwords do not match.")
-            
-            if st.button("Back to Login"):
-                st.session_state["page"] = "login"
-                st.rerun()
-        
-        st.markdown("</div>", unsafe_allow_html=True)
