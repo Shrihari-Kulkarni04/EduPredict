@@ -319,50 +319,70 @@ def create_navigation():
         st.title("EduPredict")
 
     with col_profile:
+        # Handle query params so menu can be toggled/closed via links (used for outside click)
+        params = st.experimental_get_query_params()
+        action = params.get("action", [None])[0]
+        spm = params.get("show_profile_menu", [None])[0]
+        if action or spm is not None:
+            # Apply requested actions
+            if spm is not None:
+                st.session_state["show_profile_menu"] = str(spm) == "1" or str(spm).lower() == "true"
+            if action:
+                if action == "edit_profile":
+                    st.session_state["show_profile_editor"] = True
+                    st.session_state["show_profile_menu"] = False
+                elif action == "logout":
+                    st.session_state["page"] = "login"
+                    st.session_state.pop("current_page", None)
+                    st.session_state.pop("marks_displayed", None)
+                    st.session_state.pop("show_profile_editor", None)
+                    st.session_state.pop("username", None)
+                    st.session_state["show_profile_menu"] = False
+            # clear params and rerun to apply clean state
+            st.experimental_set_query_params()
+            st.experimental_rerun()
+
         st.markdown("", unsafe_allow_html=True)
         profile_src = get_profile_picture_src(user)
         css_profile_src = profile_src.replace("\\", "\\\\").replace('"', '\\"')
+
+        # Ensure session state flags exist
+        if "show_profile_menu" not in st.session_state:
+            st.session_state["show_profile_menu"] = False
+
+        # Avatar button toggles the menu
         st.markdown(
             f"""
             <style>
-                .st-key-profile_toggle {{
-                    display: flex;
-                    justify-content: flex-end;
-                    margin-top: 10px;
-                }}
-                .st-key-profile_toggle button {{
-                    width: 58px !important;
-                    min-width: 58px !important;
-                    height: 58px !important;
-                    padding: 0 !important;
-                    border-radius: 50% !important;
-                    border: 2px solid #111111 !important;
-                    background-image: url("{css_profile_src}") !important;
-                    background-position: center !important;
-                    background-size: cover !important;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
-                }}
-                .st-key-profile_toggle button p {{
-                    font-size: 0 !important;
-                }}
+                .avatar-btn {{ width:58px; height:58px; display:inline-block; border-radius:50%; border:2px solid #111; background-image:url('{css_profile_src}'); background-size:cover; background-position:center; }}
             </style>
+            <a href="?show_profile_menu={int(not st.session_state.get('show_profile_menu', False))}&_ts={int(datetime.now().timestamp())}"><div class="avatar-btn" title="Profile"></div></a>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-        if st.button("Profile", key="profile_toggle", help="Open profile"):
-            st.session_state["show_profile_editor"] = not st.session_state.get("show_profile_editor", False)
+        # Render dropdown overlay card when menu is shown
+        if st.session_state.get("show_profile_menu"):
+            ts = int(datetime.now().timestamp())
             st.markdown(
-            """
-            <style>
-            hr {
-                margin-top: 5px !important;
-                margin-bottom: 5px !important;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+                f"""
+                <style>
+                    .pm-overlay {{ position: fixed; left:0; top:0; width:100%; height:100%; z-index:999; }}
+                    .pm-card {{ position: absolute; right:20px; top:70px; background:#fff; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.12); padding:8px; width:200px; }}
+                    .pm-link {{ display:block; padding:8px 10px; color:#111; text-decoration:none; font-weight:600; border-radius:6px; margin-bottom:6px; }}
+                    .pm-link:hover {{ background: rgba(0,0,0,0.03); }}
+                    .pm-logout {{ color:#c0392b; font-weight:700; }}
+                </style>
+                <div class="pm-overlay">
+                    <a href="?show_profile_menu=0&_ts={ts}" style="position:absolute; left:0; top:0; width:100%; height:100%;"></a>
+                    <div class="pm-card">
+                        <a class="pm-link" href="?action=edit_profile&show_profile_menu=0&_ts={ts}">✏️  Edit Profile</a>
+                        <a class="pm-link pm-logout" href="?action=logout&show_profile_menu=0&_ts={ts}">🚪  Logout</a>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
     st.markdown("<br>", unsafe_allow_html=True)
     # Add spacer columns between the four main nav buttons to increase horizontal gaps
     left_space, col1, gap1, col2, gap2, col3, gap3, col4, right_space = st.columns(
