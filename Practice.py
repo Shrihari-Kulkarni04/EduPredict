@@ -271,11 +271,12 @@ def render_profile_editor(user):
         save_profile_changes(user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic)
 
 def create_navigation():
+
     user = users_collection.find_one(
         {"username": st.session_state.get("username", "")}
     )
 
-    col_title, col_profile = st.columns([8, 2])
+    col_title, col_profile = st.columns([12, 2])
 
     with col_title:
         st.title("EduPredict")
@@ -313,10 +314,10 @@ def create_navigation():
         if st.button("Profile", key="profile_toggle", help="Open profile"):
             st.session_state["show_profile_editor"] = not st.session_state.get("show_profile_editor", False)
 
-    if st.session_state.get("show_profile_editor", False):
-        render_profile_editor(user)
+        if st.session_state.get("show_profile_editor", False):
+            render_profile_editor(user)
 
-    col1, col2, col3, col4 = st.columns(4)
+    left_space, col1, col2, col3, col4 = st.columns([1,4,4,4,4])
     with col1:
         if st.button("Performance History", key="nav_performance"):
             st.session_state["current_page"] = "performance"
