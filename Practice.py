@@ -1151,7 +1151,7 @@ else:
                     ">
                         <h2>🔐 Welcome Back</h2>
                         <p>Access your personalized learning dashboard</p>
-                    </div>
+                    </div> 
                     """, unsafe_allow_html=True)
                 st.markdown("""
                     <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
