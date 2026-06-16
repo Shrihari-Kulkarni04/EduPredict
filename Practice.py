@@ -313,10 +313,10 @@ def create_navigation():
         {"username": st.session_state.get("username", "")}
     )
 
-    col_title, col_profile = st.columns([9, 1])
+    col_title, col_profile = st.columns([9,1])
 
     with col_title:
-        st.title("EduPredict")
+        st.image("assets/edupredict_icon.png", width=80)
 
     with col_profile:
 
@@ -1035,21 +1035,10 @@ else:
     # Left Side - Features of Product
     with col1:
 
-        st.markdown("""
-        <div style="padding-top:20px;">
-            <h1 style="font-size:55px; margin-bottom:10px;">
-                🎓 EduPredict
-            </h1>
-            <h3 style="color:#4B5563; margin-bottom:20px;">
-                AI-Powered Personalized Learning Platform
-            </h3>
-            <p style="font-size:20px; line-height:1.8;">
-                Track performance, predict scores, and receive
-                personalized learning recommendations based on
-                your academic progress.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.image(
+        "assets/edupredict_logo.png",
+        width=300
+    )
 
         if st.button(
             "🚀 Start Learning Today",
@@ -1223,12 +1212,8 @@ else:
         <div style="text-align:center; padding:20px; color:#6b7280;">
             <h4>EduPredict © 2026</h4>
             <p style="margin-top:15px; font-size:14px;">
-                Developed by <b><I>Shrihari H Kulkarni</b></I>
-            </p>
-            <p>
-                AI-Powered Personalized Learning Platform
-            </p>
-            <p>
+                Developed by <b><I>Shrihari H Kulkarni</b></I><br>
+                AI-Powered Personalized Learning Platform<br>
                 Built with Python • Streamlit • MongoDB • TensorFlow
             </p>
         </div>
