@@ -1037,8 +1037,16 @@ else:
 
         st.image(
         "assets/edupredict_logo.png",
-        width=300
-    )
+        width=180
+        )
+        st.markdown("""
+        <div style='text-align:center;'>
+        <p style='font-size:24px;'>
+        AI-powered personalized learning, score prediction,
+        and academic analytics.
+        </p>
+        </div>
+        """, unsafe_allow_html=True)
 
         if st.button(
             "🚀 Start Learning Today",
@@ -1123,7 +1131,7 @@ else:
             padding: 30px;
             border-radius: 16px;
             border: 1px solid #e5e7eb;
-            box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0px 15px 35px rgba(0,0,0,0.12);
         }
         </style>
         """, unsafe_allow_html=True)
@@ -1145,29 +1153,43 @@ else:
                         <p>Access your personalized learning dashboard</p>
                     </div>
                     """, unsafe_allow_html=True)
-                st.markdown("### Login")
+                st.markdown("""
+                    <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
+                    𝓛𝓸𝓰𝓲𝓷
+
+                """,
+                  unsafe_allow_html=True)
                 username = st.text_input("User ID", placeholder="Enter User ID", key="login_username")
                 password = st.text_input("Password", type="password", placeholder="Enter Password", key="login_password")
                 
                 col_login, col_signup = st.columns([1,1], gap="large")
                 
                 with col_login:
-                    if st.button("Login"):
+                    if st.button("🚀 Login", use_container_width=True):
+
                         user = users_collection.find_one({"username": username})
-                        if user and verify_password(password, user['password']):
+
+                        if user and verify_password(password, user["password"]):
                             st.session_state["page"] = "dashboard"
                             st.session_state["username"] = username
                             st.rerun()
+
                         else:
-                            st.error("Invalid User ID or Password.")
+                            st.error("Invalid User ID or Password")
                 
                 with col_signup:
-                    if st.button("Sign Up"):
-                        st.session_state["page"] = "signup"
-                        st.rerun()
+                   if st.button("Create Account", use_container_width=True):
+                    st.session_state["page"] = "signup"
+                    st.rerun()
+
             elif st.session_state["page"] == "signup":
 
-                st.subheader("Sign Up")
+                st.markdown("""
+                    <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
+                    𝓢𝓲𝓰𝓷 𝓤𝓹
+
+                """,
+                  unsafe_allow_html=True)
 
                 full_name = st.text_input("Full Name")
                 username = st.text_input("Username")
@@ -1180,7 +1202,7 @@ else:
                 col_create, col_back = st.columns(2)
 
                 with col_create:
-                    if st.button("Create Account"):
+                    if st.button("Sign Up", use_container_width=True):
 
                         if users_collection.find_one({"username": username}):
                             st.error("Username already exists.")
