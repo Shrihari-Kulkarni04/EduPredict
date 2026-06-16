@@ -614,12 +614,71 @@ def render_analytics_page(subject_scores):
         st.info("No performance data available.")
         return
 
-    # Top row KPI cards
+    # Top row KPI Cards
+
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Average Score", f"{analytics['average_score']}")
-    k2.metric("Strongest Subject", analytics['strongest_subject'])
-    k3.metric("Weakest Subject", analytics['weakest_subject'])
-    k4.metric("Total Subjects", analytics['total_subjects'])
+
+    with k1:
+        st.markdown(f"""
+        <div style="
+            background:white;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            border:1px solid #e5e7eb;
+        ">
+            <h4>📈 Average Score</h4>
+            <h2>{analytics['average_score']}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k2:
+        st.markdown(f"""
+        <div style="
+            background:white;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            border:1px solid #e5e7eb;
+        ">
+            <h4>🏆 Strongest Subject</h4>
+            <h2>{analytics['strongest_subject']}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k3:
+        st.markdown(f"""
+        <div style="
+            background:white;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            border:1px solid #e5e7eb;
+        ">
+            <h4>⚠️ Weakest Subject</h4>
+            <h2>{analytics['weakest_subject']}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k4:
+        st.markdown(f"""
+        <div style="
+            background:white;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            border:1px solid #e5e7eb;
+        ">
+            <h4>📚 Total Subjects</h4>
+            <h2>{analytics['total_subjects']}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Middle row charts
     c1, c2 = st.columns([2, 3])
