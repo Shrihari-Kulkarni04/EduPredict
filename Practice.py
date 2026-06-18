@@ -484,48 +484,30 @@ def create_marks_bar_graph(subject_scores):
     
     return fig
 
+from sklearn.linear_model import LinearRegression
+
 def train_and_predict(subject_scores):
     predictions = {}
+
     for subject, scores in subject_scores.items():
+
         if len(scores) < 2:
             predictions[subject] = "Not enough data to make a prediction."
             continue
 
-        # Calculate mean score for the subject
         mean_score = sum(scores) / len(scores)
 
-        # Convert to a DataFrame
-        df = pd.DataFrame(scores, columns=['score'])
-        df['next_score'] = df['score'].shift(-1)
-        df.dropna(inplace=True)
+        X = np.array(range(len(scores))).reshape(-1, 1)
+        y = np.array(scores)
 
-        # Split the data
-        X = df[['score']].values
-        y = df['next_score'].values
+        model = LinearRegression()
+        model.fit(X, y)
 
-        # Define a simpler model
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(5, activation='relu', input_shape=(1,)),
-            tf.keras.layers.Dense(1)
-        ])
+        next_index = np.array([[len(scores)]])
+        predicted_score = float(model.predict(next_index)[0])
 
-        # Compile the model with a larger learning rate
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), loss='mse')
+        final_prediction = max(min(predicted_score, 95), mean_score)
 
-        # Train the model with fewer epochs
-        model.fit(X, y, epochs=10, verbose=0)
-
-        # Predict the next score
-        last_score = np.array([scores[-1]]).reshape(-1, 1)
-        predicted_score = model.predict(last_score, verbose=0)
-        
-        # Get the raw prediction
-        raw_prediction = float(predicted_score[0][0])
-        
-        # Ensure prediction is between mean and 95
-        final_prediction = max(min(raw_prediction, 95), mean_score)
-        
-        # Round the prediction to 2 decimal places
         predictions[subject] = round(final_prediction, 2)
 
     return predictions
