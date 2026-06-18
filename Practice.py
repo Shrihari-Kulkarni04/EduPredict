@@ -328,8 +328,35 @@ def create_navigation():
         if "show_profile_menu" not in st.session_state:
             st.session_state["show_profile_menu"] = False
 
-        # Avatar button toggles the menu
-        if st.button("👤", key="profile_avatar_btn"):
+        # image button for profile menu
+        st.markdown(
+            f"""
+            <style>
+            .st-key-profile_avatar_btn {{
+                display: flex;
+                justify-content: flex-end;
+            }}
+            .st-key-profile_avatar_btn button {{
+                width: 55px !important;
+                min-width: 55px !important;
+                height: 55px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                border: 2px solid #ddd !important;
+                background-image: url("{css_profile_src}") !important;
+                background-position: center !important;
+                background-size: cover !important;
+                cursor: pointer !important;
+            }}
+            .st-key-profile_avatar_btn button p {{
+                font-size: 0 !important;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+        if st.button("", key="profile_avatar_btn", help="Open profile menu"):
 
             if st.session_state.get("show_profile_editor", False):
                 st.session_state["show_profile_editor"] = False
