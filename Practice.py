@@ -9,7 +9,6 @@ from pymongo import MongoClient
 import bcrypt
 import plotly.graph_objects as go
 import pandas as pd
-import tensorflow as tf
 import numpy as np
 
 # Set page config at the beginning
