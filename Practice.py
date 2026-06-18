@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 
 # Set page config at the beginning
-st.set_page_config(page_title="AI Learning Platform", layout="wide")
+st.set_page_config(page_title="EduPredict", layout="wide")
 
 # MongoDB Connection
 import os
