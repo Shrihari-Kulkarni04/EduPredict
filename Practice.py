@@ -258,38 +258,41 @@ def render_profile_editor(user):
     current_grade_index = grade_options.index(user.get("class_grade", "")) if user.get("class_grade", "") in grade_options else 0
 
     with st.form("profile_edit_form"):
-        with col2:
-            full_name = st.text_input(
-                "Name",
-                value=user.get("full_name", ""),
-                key="profile_full_name"
-            )
 
-            class_grade = st.selectbox(
-                "Class",
-                grade_options,
-                index=current_grade_index,
-                key="profile_class"
-            )
+        full_name = st.text_input(
+            "Name",
+            value=user.get("full_name", ""),
+            key="profile_full_name"
+        )
 
-            new_username = st.text_input(
-                "Username",
-                value=user.get("username", ""),
-                key="profile_username"
-            )
+        class_grade = st.selectbox(
+            "Class",
+            grade_options,
+            index=current_grade_index,
+            key="profile_class"
+        )
+
+        new_username = st.text_input(
+            "Username",
+            value=user.get("username", ""),
+            key="profile_username"
+        )
+
         uploaded_file = st.file_uploader(
             "Profile picture",
             type=["png", "jpg", "jpeg", "webp"],
             key="profile_picture_upload"
         )
+
         remove_profile_pic = st.checkbox(
             "Remove current profile picture",
             value=False,
             disabled=not user.get("profile_pic"),
             key="remove_profile_picture"
         )
-        submitted = st.form_submit_button("Save Profile")
 
+        submitted = st.form_submit_button("Save Profile")
+        
     if submitted:
         save_profile_changes(user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic)
 
