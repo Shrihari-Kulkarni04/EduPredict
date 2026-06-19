@@ -258,28 +258,22 @@ def render_profile_editor(user):
     current_grade_index = grade_options.index(user.get("class_grade", "")) if user.get("class_grade", "") in grade_options else 0
 
     with st.form("profile_edit_form"):
-        col1, col2 = st.columns([5, 10])
-        with col1:
-            st.markdown("**Name**")
-            st.markdown("**Class**")
-            st.markdown("**Username**")
-
         with col2:
             full_name = st.text_input(
-                "",
+                "Name",
                 value=user.get("full_name", ""),
                 key="profile_full_name"
             )
 
             class_grade = st.selectbox(
-                "",
+                "Class",
                 grade_options,
                 index=current_grade_index,
                 key="profile_class"
             )
 
             new_username = st.text_input(
-                "",
+                "Username",
                 value=user.get("username", ""),
                 key="profile_username"
             )
