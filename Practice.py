@@ -19,10 +19,13 @@ import os
 client = MongoClient(os.getenv("MONGO_URI"))
 print("MONGO_URI =", os.getenv("MONGO_URI"))
 db = client["education_system"]
+
 users_collection = db["users"]
+
 users_collection.create_index(
-    "createdAt",
-    expireAfterSeconds=2592000
+    [("createdAt", 1)],
+    expireAfterSeconds=1728000,
+    name="ttl_20_days"
 )
 
 GRADE_OPTIONS = ["6", "7", "8", "9", "10", "11 Science", "11 Commerce", "12 Science", "12 Commerce"]
