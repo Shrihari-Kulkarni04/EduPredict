@@ -36,7 +36,30 @@ def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def verify_password(password, hashed_password):
-    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+    return bcrypt.checkpw(
+        password.encode('utf-8'),
+        hashed_password.encode('utf-8')
+    )
+
+# ADD HERE
+
+import re
+
+def validate_password(password):
+
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+
+    if not re.search(r"[A-Z]", password):
+        return "Password must contain at least one uppercase letter."
+
+    if not re.search(r"[a-z]", password):
+        return "Password must contain at least one lowercase letter."
+
+    if not re.search(r"[0-9]", password):
+        return "Password must contain at least one number."
+
+    return None
 
 # Apply styling
 st.markdown(
@@ -1271,7 +1294,21 @@ else:
                 with col_create:
                     if st.button("Sign Up", use_container_width=True):
 
-                        if users_collection.find_one({"username": username}):
+                        password_error = validate_password(password)
+
+                        if not full_name.strip():
+                            st.error("Full name cannot be empty.")
+
+                        elif not username.strip():
+                            st.error("Username cannot be empty.")
+
+                        elif password != confirm_password:
+                            st.error("Passwords do not match.")
+
+                        elif password_error:
+                            st.error(password_error)
+
+                        elif users_collection.find_one({"username": username}):
                             st.error("Username already exists.")
 
                         else:
