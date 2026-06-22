@@ -268,6 +268,11 @@ def save_profile_changes(current_user, full_name, class_grade, new_username, upl
         st.session_state.pop("predictions", None)
         st.session_state.pop("last_scores_state", None)
 
+    updated_user = users_collection.find_one(
+        {"username": clean_username}
+    )
+
+    st.session_state["user"] = updated_user
     st.session_state["profile_update_success"] = True
     st.rerun()
 
@@ -351,9 +356,7 @@ def render_profile_editor(user):
 
 def create_navigation():
 
-    user = users_collection.find_one(
-        {"username": st.session_state.get("username", "")}
-    )
+    user = st.session_state.get("user")
 
     col_title, col_profile = st.columns([9,1])
 
@@ -449,7 +452,9 @@ def create_navigation():
             st.rerun()
 
 def display_dashboard(username):
-    user = users_collection.find_one({"username": username})
+    
+    user = st.session_state.get("user")
+
     if not user:
         st.error("User not found!")
         return
@@ -759,8 +764,6 @@ def render_analytics_page(subject_scores):
 
 
 def display_dashboard_page():
-
-    
     
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "dashboard"
@@ -769,10 +772,6 @@ def display_dashboard_page():
     create_navigation()
     
     st.markdown("<hr>", unsafe_allow_html=True)
-
-    user = users_collection.find_one(
-        {"username": st.session_state.get("username", "")}
-    )
 
     if st.session_state.get("show_profile_editor", False):
         render_profile_editor(user)
@@ -788,10 +787,7 @@ def display_dashboard_page():
     elif st.session_state["current_page"] == "performance":
         st.title("Performance History")
         
-        user = users_collection.find_one(
-            {"username": st.session_state.get("username", "")}
-        )
-
+        user = st.session_state.get("user")
        
         all_scores = {
             subject: sum(scores) / len(scores)
@@ -837,7 +833,8 @@ def display_dashboard_page():
             """)
             
         # Get user's class grade
-        user = users_collection.find_one({"username": st.session_state.get("username", "")})
+        user = st.session_state.get("user")
+
         if user:
             class_grade = user.get("class_grade", "")
             subjects = get_subjects_for_grade(class_grade)
@@ -915,7 +912,7 @@ def display_dashboard_page():
         st.title("Study Material")
         
         # Get user's class grade
-        user = users_collection.find_one({"username": st.session_state.get("username", "")})
+        user = st.session_state.get("user")
         if user:
             class_grade = user.get("class_grade", "")
             
@@ -1052,7 +1049,7 @@ def display_dashboard_page():
         if "subject_scores" not in st.session_state:
             st.info("Please enter your scores for each subject.")
             # Get user's class grade
-            user = users_collection.find_one({"username": st.session_state.get("username", "")})
+            user = st.session_state.get("user")
             if user:
                 class_grade = user.get("class_grade", "")
                 subjects = get_subjects_for_grade(class_grade)
@@ -1298,6 +1295,8 @@ else:
                             else:
                                 st.session_state["page"] = "dashboard"
                                 st.session_state["username"] = username.strip()
+                                st.session_state["user"] = user
+
                                 st.rerun()
                 
                 with col_signup:
