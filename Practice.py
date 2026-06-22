@@ -61,6 +61,26 @@ def validate_password(password):
 
     return None
 
+import re
+
+def validate_username(username):
+
+    username = username.strip()
+
+    if len(username) < 4:
+        return "Username must be at least 4 characters long."
+
+    if len(username) > 20:
+        return "Username cannot exceed 20 characters."
+
+    if " " in username:
+        return "Username cannot contain spaces."
+
+    if not re.match(r"^[A-Za-z0-9_]+$", username):
+        return "Username can only contain letters, numbers, and underscore (_)."
+
+    return None
+
 # Apply styling
 st.markdown(
     """
@@ -1294,13 +1314,14 @@ else:
                 with col_create:
                     if st.button("Sign Up", use_container_width=True):
 
+                        username_error = validate_username(username)
                         password_error = validate_password(password)
 
                         if not full_name.strip():
                             st.error("Full name cannot be empty.")
 
-                        elif not username.strip():
-                            st.error("Username cannot be empty.")
+                        elif username_error:
+                            st.error(username_error)
 
                         elif password != confirm_password:
                             st.error("Passwords do not match.")
@@ -1308,13 +1329,13 @@ else:
                         elif password_error:
                             st.error(password_error)
 
-                        elif users_collection.find_one({"username": username}):
+                        elif users_collection.find_one({"username": username.strip()}):
                             st.error("Username already exists.")
 
                         else:
                             users_collection.insert_one({
-                                "full_name": full_name,
-                                "username": username,
+                                "full_name": full_name.strip(),
+                                "username": username.strip(),
                                 "class_grade": class_grade,
                                 "password": hash_password(password),
                                 "createdAt": datetime.now(UTC)
@@ -1322,7 +1343,7 @@ else:
 
                             st.success("Account created successfully!")
 
-                            st.session_state["username"] = username
+                            st.session_state["username"] = username.strip()
                             st.session_state["page"] = "dashboard"
 
                             st.rerun()
