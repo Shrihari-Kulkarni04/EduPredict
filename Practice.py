@@ -1277,15 +1277,27 @@ else:
                 with col_login:
                     if st.button("🚀 Login", use_container_width=True):
 
-                        user = users_collection.find_one({"username": username})
+                        if not username.strip():
+                            st.error("Please enter your username.")
 
-                        if user and verify_password(password, user["password"]):
-                            st.session_state["page"] = "dashboard"
-                            st.session_state["username"] = username
-                            st.rerun()
+                        elif not password:
+                            st.error("Please enter your password.")
 
                         else:
-                            st.error("Invalid User ID or Password")
+                            user = users_collection.find_one(
+                                {"username": username.strip()}
+                            )
+
+                            if not user:
+                                st.error("Username does not exist.")
+
+                            elif not verify_password(password, user["password"]):
+                                st.error("Incorrect password.")
+
+                            else:
+                                st.session_state["page"] = "dashboard"
+                                st.session_state["username"] = username.strip()
+                                st.rerun()
                 
                 with col_signup:
                    if st.button("Create Account", use_container_width=True):
