@@ -421,10 +421,11 @@ def create_navigation():
                 st.session_state["show_profile_menu"] = False
                 st.rerun()
 
-            if st.button("🚪 Logout", key="logout_menu_btn"):
+            if st.button("Logout", key="profile_logout"):
                 st.session_state.clear()
                 st.session_state["page"] = "login"
                 st.rerun()
+                
     st.markdown("<br>", unsafe_allow_html=True)
     # Add spacer columns between the four main nav buttons to increase horizontal gaps
     left_space, col1, gap1, col2, gap2, col3, gap3, col4, right_space = st.columns(
