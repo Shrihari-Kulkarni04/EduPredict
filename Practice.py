@@ -247,7 +247,7 @@ def save_profile_changes(current_user, full_name, class_grade, new_username, upl
 
     update_payload = {
         "$set": {
-            "full_name": clean_full_name,
+            "full_name": clean_full_name, 
             "class_grade": class_grade,
             "username": clean_username,
         }
