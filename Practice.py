@@ -263,7 +263,10 @@ def save_profile_changes(current_user, full_name, class_grade, new_username, upl
         st.error("Could not find your profile to update.")
         return
 
-    st.session_state["username"] = clean_username
+    updated_user = users_collection.find_one(
+        {"username": clean_username}
+    )
+    st.session_state["user"] = updated_user
     if class_grade != current_user.get("class_grade"):
         st.session_state.pop("predictions", None)
         st.session_state.pop("last_scores_state", None)
@@ -1296,7 +1299,6 @@ else:
                                 st.session_state["page"] = "dashboard"
                                 st.session_state["username"] = username.strip()
                                 st.session_state["user"] = user
-
                                 st.rerun()
                 
                 with col_signup:
