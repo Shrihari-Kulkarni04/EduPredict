@@ -24,8 +24,8 @@ users_collection = db["users"]
 
 users_collection.create_index(
     [("createdAt", 1)],
-    expireAfterSeconds=180,
-    name="ttl_3_minutes"
+    expireAfterSeconds=1728000,
+    name="ttl_20_days"
 )
 
 GRADE_OPTIONS = ["6", "7", "8", "9", "10", "11 Science", "11 Commerce", "12 Science", "12 Commerce"]
