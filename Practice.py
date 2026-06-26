@@ -768,6 +768,8 @@ def render_analytics_page(subject_scores):
 
 def display_dashboard_page():
     
+    user = st.session_state.get("user")
+
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "dashboard"
 
@@ -777,7 +779,7 @@ def display_dashboard_page():
     st.markdown("<hr>", unsafe_allow_html=True)
 
     if st.session_state.get("show_profile_editor", False):
-        render_profile_editor(user)
+        render_profile_editor(st.session_state.get("user"))
         st.markdown("<hr>", unsafe_allow_html=True)
 
     # Load scores from MongoDB when initializing
@@ -789,8 +791,6 @@ def display_dashboard_page():
         display_dashboard(st.session_state.get("username", ""))
     elif st.session_state["current_page"] == "performance":
         st.title("Performance History")
-        
-        user = st.session_state.get("user")
        
         all_scores = {
             subject: sum(scores) / len(scores)
