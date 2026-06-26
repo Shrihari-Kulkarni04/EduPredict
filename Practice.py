@@ -16,9 +16,13 @@ st.set_page_config(page_title="EduPredict", layout="wide")
 
 # MongoDB Connection
 import os
-client = MongoClient(os.getenv("MONGO_URI"))
-print("MONGO_URI =", os.getenv("MONGO_URI"))
-db = client["education_system"]
+@st.cache_resource
+def get_database():
+    client = MongoClient(os.getenv("MONGO_URI"))
+    return client["education_system"]
+
+db = get_database()
+users_collection = db["users"]
 
 users_collection = db["users"]
 
