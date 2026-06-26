@@ -770,6 +770,18 @@ def display_dashboard_page():
     
     user = st.session_state.get("user")
 
+    if user is None:
+        username = st.session_state.get("username")
+        if username:
+            user = users_collection.find_one({"username": username})
+            st.session_state["user"] = user
+
+    if user is None:
+        st.error("User session expired. Please login again.")
+        st.session_state["page"] = "login"
+        st.rerun()
+    user = st.session_state.get("user")
+
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "dashboard"
 
@@ -1354,6 +1366,9 @@ else:
                                 "password": hash_password(password),
                                 "createdAt": datetime.now(UTC)
                             })
+
+                            # Fetch the newly created user
+                            new_user = users_collection.find_one({"username": username.strip()})
 
                             st.success("Account created successfully!")
 
