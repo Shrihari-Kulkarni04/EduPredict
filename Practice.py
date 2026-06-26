@@ -28,6 +28,12 @@ users_collection.create_index(
     name="ttl_20_days"
 )
 
+users_collection.create_index(
+    [("username", 1)],
+    unique=True,
+    name="username_index"
+)
+
 GRADE_OPTIONS = ["6", "7", "8", "9", "10", "11 Science", "11 Commerce", "12 Science", "12 Commerce"]
 MAX_PROFILE_IMAGE_BYTES = 1_000_000
 ALLOWED_PROFILE_IMAGE_TYPES = {"image/png", "image/jpeg", "image/jpg", "image/webp"}
