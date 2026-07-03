@@ -171,11 +171,13 @@ st.markdown(
         }
 
         .welcome-section {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
+        padding: 30px;
+        background: linear-gradient(135deg, #2563EB, #7C3AED);
+        color: white;
+        border-radius: 18px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+    }
         .book-card {
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
@@ -484,12 +486,14 @@ def display_dashboard(username):
 
     # Welcome Section
     st.markdown(f"""
-        <div class='welcome-section'>
-            <h1>Welcome, {user['full_name']}! 👋</h1>
-            <h2>Class: {user['class_grade']}</h2>
-            <br />
-            <h1>"The Secret of getting Ahead is getting Started ~ Mark Twain"</h1>
-        </div>
+    <div class='welcome-section'>
+        <h1>Welcome Back, {user['full_name']} 👋</h1>
+        <h3>Class: {user['class_grade']}</h3>
+        <br>
+        <p style="font-size:18px;">
+            Stay consistent, track your progress and let AI help you achieve better academic performance.
+        </p>
+    </div>
     """, unsafe_allow_html=True)
 
 def create_marks_bar_graph(subject_scores):
