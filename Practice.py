@@ -478,23 +478,66 @@ def create_navigation():
 
 def display_dashboard(username):
     
-    user = st.session_state.get("user")
+            user = st.session_state.get("user")
 
-    if not user:
-        st.error("User not found!")
-        return
+            if not user:
+                st.error("User not found!")
+                return
 
-    # Welcome Section
-    st.markdown(f"""
-    <div class='welcome-section'>
-        <h1>Welcome Back, {user['full_name']} 👋</h1>
-        <h3>Class: {user['class_grade']}</h3>
-        <br>
-        <p style="font-size:18px;">
-            Stay consistent, track your progress and let AI help you achieve better academic performance.
+            # Welcome Section
+            st.markdown(f"""
+        <div style="
+        background:#ffffff;
+        padding:30px;
+        border-radius:18px;
+        border:1px solid #e5e7eb;
+        box-shadow:0 8px 20px rgba(0,0,0,.08);
+        margin-bottom:25px;
+        ">
+
+        <p style="
+        color:#2563EB;
+        font-size:15px;
+        font-weight:600;
+        margin-bottom:8px;
+        ">
+        DASHBOARD
         </p>
-    </div>
-    """, unsafe_allow_html=True)
+
+        <h2 style="
+        margin:0;
+        color:#111827;
+        ">
+        Welcome back, {user['full_name']} 👋
+        </h2>
+
+        <p style="
+        font-size:17px;
+        color:#6b7280;
+        margin-top:10px;
+        ">
+        Class : <b>{user['class_grade']}</b>
+        </p>
+
+        <hr style="margin:18px 0;">
+
+        <p style="
+        font-size:16px;
+        color:#374151;
+        margin:0;
+        ">
+        "The secret of getting ahead is getting started."
+        </p>
+
+        <p style="
+        margin-top:8px;
+        color:#9ca3af;
+        ">
+        — Mark Twain
+        </p>
+
+        </div>
+        """, unsafe_allow_html=True)
 
 def create_marks_bar_graph(subject_scores):
     # Create a bar graph using plotly
