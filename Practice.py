@@ -385,6 +385,17 @@ def create_navigation():
 
     col_title, col_profile = st.columns([9,1])
 
+    st.markdown(
+            """
+            <style>
+            .block-container{
+                padding-top:1rem;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
     with col_title:
         st.image("assets/edupredict_icon.png", width=80)
 
@@ -453,8 +464,7 @@ def create_navigation():
                 st.session_state.clear()
                 st.session_state["page"] = "login"
                 st.rerun()
-                
-    st.markdown("<br>", unsafe_allow_html=True)
+
     # Add spacer columns between the four main nav buttons to increase horizontal gaps
     left_space, col1, gap1, col2, gap2, col3, gap3, col4, right_space = st.columns(
         [2, 3, 1.5, 3, 1.5, 3, 1.5, 3, 2]
@@ -496,10 +506,12 @@ def display_dashboard(username):
         ">
 
         <p style="
-        color:#2563EB;
+        color:#111827;
         font-size:15px;
-        font-weight:600;
+        font-weight:700;
         margin-bottom:8px;
+        letter-spacing:1px;
+        text-transform:uppercase;
         ">
         DASHBOARD
         </p>
