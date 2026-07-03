@@ -390,7 +390,7 @@ def create_navigation():
     with col_title:
         st.markdown(
             """
-            <div style="margin-top:-18px;">
+            <div style="margin-top:-120px;">
             """,
             unsafe_allow_html=True
         )
