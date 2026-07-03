@@ -541,6 +541,52 @@ def display_dashboard(username):
 
         </div>
         """, unsafe_allow_html=True)
+            
+        # Dashboard Summary Cards
+            subject_scores = st.session_state.get("subject_scores", {})
+            analytics = compute_analytics(subject_scores)
+
+            if analytics:
+
+                c1, c2, c3, c4 = st.columns(4)
+
+                cards = [
+                    ("Average Score", analytics["average_score"]),
+                    ("Strongest Subject", analytics["strongest_subject"]),
+                    ("Weakest Subject", analytics["weakest_subject"]),
+                    ("Total Subjects", analytics["total_subjects"]),
+                ]
+
+                for col, (title, value) in zip([c1, c2, c3, c4], cards):
+                    with col:
+                        st.markdown(f"""
+                        <div style="
+                            background:white;
+                            padding:20px;
+                            border-radius:15px;
+                            border:1px solid #e5e7eb;
+                            box-shadow:0 4px 12px rgba(0,0,0,.08);
+                            text-align:center;
+                            min-height:130px;
+                        ">
+                            <p style="
+                                color:#6b7280;
+                                font-size:15px;
+                                margin-bottom:8px;
+                            ">
+                                {title}
+                            </p>
+
+                            <h2 style="
+                                color:#111827;
+                                margin:0;
+                            ">
+                                {value}
+                            </h2>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                st.markdown("<br>", unsafe_allow_html=True)
 
 def create_marks_bar_graph(subject_scores):
     # Create a bar graph using plotly
