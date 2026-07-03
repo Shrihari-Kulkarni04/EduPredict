@@ -551,13 +551,13 @@ def display_dashboard(username):
                 c1, c2, c3, c4 = st.columns(4)
 
                 cards = [
-                    ("Average Score", analytics["average_score"]),
-                    ("Strongest Subject", analytics["strongest_subject"]),
-                    ("Weakest Subject", analytics["weakest_subject"]),
-                    ("Total Subjects", analytics["total_subjects"]),
+                    ("📈 Average Score", analytics["average_score"], "#2563EB"),
+                    ("🏆 Strongest Subject", analytics["strongest_subject"], "#16A34A"),
+                    ("⚠️ Weakest Subject", analytics["weakest_subject"], "#DC2626"),
+                    ("📚 Total Subjects", analytics["total_subjects"], "#7C3AED"),
                 ]
 
-                for col, (title, value) in zip([c1, c2, c3, c4], cards):
+                for col, (title, value, color) in zip([c1, c2, c3, c4], cards):
                     with col:
                         st.markdown(f"""
                         <div style="
@@ -570,7 +570,7 @@ def display_dashboard(username):
                             min-height:130px;
                         ">
                             <p style="
-                                color:#6b7280;
+                                color:{color};
                                 font-size:15px;
                                 margin-bottom:8px;
                             ">
@@ -578,7 +578,7 @@ def display_dashboard(username):
                             </p>
 
                             <h2 style="
-                                color:#111827;
+                                color:{color};
                                 margin:0;
                             ">
                                 {value}
