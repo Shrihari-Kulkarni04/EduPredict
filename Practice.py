@@ -389,7 +389,7 @@ def create_navigation():
 
     with col_title:
         st.markdown("""
-            <img src="data:image/png;base64,{logo_base64}" width="120">
+            st.image("assets/edupredict_icon.png", width=120)
         """, unsafe_allow_html=True)
 
     with col_profile:
