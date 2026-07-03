@@ -385,19 +385,8 @@ def create_navigation():
 
     col_title, col_profile = st.columns([9,1])
 
-    st.markdown(
-            """
-            <style>
-            .block-container{
-                padding-top:1rem;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-
     with col_title:
-        st.image("assets/edupredict_icon.png", width=80)
+        st.image("assets/edupredict_icon.png", width=120)
 
     with col_profile:
 
@@ -485,6 +474,11 @@ def create_navigation():
         if st.button("Analytics Dashboard", key="nav_analytics"):
             st.session_state["current_page"] = "analytics"
             st.rerun()
+
+    st.markdown(
+        "<div style='margin-top:-20px;'></div>",
+        unsafe_allow_html=True
+    )
 
 def display_dashboard(username):
     
