@@ -1210,13 +1210,15 @@ else:
         with col_a:
             st.markdown("""
             <div style="
-                background:white;
-                padding:20px;
-                border-radius:10px;
+               background:#ffffff;
+                padding:24px;
+                border-radius:18px;
                 border:1px solid #e5e7eb;
-                height:200px;
+                height:210px;
+                box-shadow:0 10px 30px rgba(0,0,0,0.08);
+                transition:all .3s ease;
             ">
-                <h3>📊 Performance Analytics</h3>
+                <h3 style="color:#4F46E5;">📊 Performance Analytics</h3>
                 <p>Track academic progress and monitor performance trends.</p>
             </div>
             """, unsafe_allow_html=True)
@@ -1230,7 +1232,7 @@ else:
                 border:1px solid #e5e7eb;
                 height:200px;
             ">
-                <h3>🤖 AI Score Prediction</h3>
+                <h3 style="color:#10B981;">🤖 AI Score Prediction</h3>
                 <p>Predict future scores using AI-powered analysis.</p>
             </div>
             """, unsafe_allow_html=True)
@@ -1244,7 +1246,7 @@ else:
                 border:1px solid #e5e7eb;
                 height:200px;
             ">
-                <h3>📚 Study Material</h3>
+                <h3 style="color:#F59E0B;">📚 Study Material</h3>
                 <p>Access class-wise learning resources and materials.</p>
             </div>
             """, unsafe_allow_html=True)
