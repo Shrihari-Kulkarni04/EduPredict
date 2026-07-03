@@ -388,16 +388,9 @@ def create_navigation():
     col_title, col_profile = st.columns([9,1])
 
     with col_title:
-        st.markdown(
-            """
-            <div style="margin-top:-120px;">
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.image("assets/edupredict_icon.png", width=120)
-
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("""
+            <img src="data:image/png;base64,{logo_base64}" width="120">
+        """, unsafe_allow_html=True)
 
     with col_profile:
 
