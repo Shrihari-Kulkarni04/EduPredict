@@ -107,21 +107,23 @@ st.markdown(
             color: black !important;
         }
         .stButton > button {
-        background: linear-gradient(135deg, #2563EB, #7C3AED) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 12px 18px !important;
-        font-size: 16px !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0px 6px 16px rgba(37, 99, 235, 0.35) !important;
-    }
+            background: #111827 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 12px 18px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            transition: all 0.25s ease !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+        }
 
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0px 10px 22px rgba(124, 58, 237, 0.45) !important;
-    }
+        .stButton > button:hover {
+            background: #000000 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.25) !important;
+        }
+
         .nav-button {
             background-color: #2c2c2c;
             color: white;
@@ -386,7 +388,16 @@ def create_navigation():
     col_title, col_profile = st.columns([9,1])
 
     with col_title:
+        st.markdown(
+            """
+            <div style="margin-top:-18px;">
+            """,
+            unsafe_allow_html=True
+        )
+
         st.image("assets/edupredict_icon.png", width=120)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with col_profile:
 
@@ -474,11 +485,6 @@ def create_navigation():
         if st.button("Analytics Dashboard", key="nav_analytics"):
             st.session_state["current_page"] = "analytics"
             st.rerun()
-
-    st.markdown(
-        "<div style='margin-top:-20px;'></div>",
-        unsafe_allow_html=True
-    )
 
 def display_dashboard(username):
     
