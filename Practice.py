@@ -1306,12 +1306,26 @@ else:
                 padding:24px;
                 border-radius:18px;
                 border:1px solid #e5e7eb;
-                height:210px;
+                min-height:220px;
                 box-shadow:0 10px 30px rgba(0,0,0,0.08);
                 transition:all .3s ease;
             ">
-                <h3 style="color:#4F46E5;">📊 Performance Analytics</h3>
-                <p>Track academic progress and monitor performance trends.</p>
+                <h3 style="
+                    color:#2563EB;
+                    font-size:28px;
+                    font-weight:700;
+                    margin-bottom:18px;
+                    ">
+                    📊 Performance Analytics
+                </h3>
+                <p style="
+                font-size:16px;
+                line-height:1.7;
+                color:#4B5563;
+                margin:0;
+                ">
+                Track academic progress and monitor performance trends.
+                </p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1324,8 +1338,22 @@ else:
                 border:1px solid #e5e7eb;
                 height:200px;
             ">
-                <h3 style="color:#10B981;">🤖 AI Score Prediction</h3>
-                <p>Predict future scores using AI-powered analysis.</p>
+                <h3 style="
+                color:#16A34A;
+                font-size:28px;
+                font-weight:700;
+                margin-bottom:18px;
+                ">
+                🤖 AI Score Prediction
+                </h3>
+                <p style="
+                font-size:16px;
+                line-height:1.7;
+                color:#4B5563;
+                margin:0;
+                ">
+                Predict future scores using AI-powered analysis.
+                </p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1338,8 +1366,22 @@ else:
                 border:1px solid #e5e7eb;
                 height:200px;
             ">
-                <h3 style="color:#F59E0B;">📚 Study Material</h3>
-                <p>Access class-wise learning resources and materials.</p>
+                <h3 style="
+                color:#EA580C;
+                font-size:28px;
+                font-weight:700;
+                margin-bottom:18px;
+                ">
+                📚 Study Material
+                </h3>
+                <p style="
+                font-size:16px;
+                line-height:1.7;
+                color:#4B5563;
+                margin:0;
+                ">
+                Access class-wise learning resources and materials.
+                </p>
             </div>
             """, unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
