@@ -1414,21 +1414,6 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-
-        stat1, stat2, stat3, stat4 = st.columns(4)
-
-        with stat1:
-            st.metric("📚 Resources", "500+")
-
-        with stat2:
-            st.metric("🤖 Predictions", "1000+")
-
-        with stat3:
-            st.metric("🎓 Students", "100+")
-
-        with stat4:
-            st.metric("📈 Accuracy", "85%")
-
     # Right Side - Login/Signup Form
     with col2:
         st.markdown("""
@@ -1446,7 +1431,7 @@ else:
         
         """, unsafe_allow_html=True)
 
-        card = st.container(border=True)
+        card = st.container()
 
         with card:
         
@@ -1456,8 +1441,24 @@ else:
                         text-align:center;
                         padding-bottom:15px;
                     ">
-                        <h2>🔐 Welcome Back</h2>
-                        <p>Access your personalized learning dashboard</p>
+                        <div style="text-align:center;padding-bottom:18px;">
+                    <h2 style="
+                        margin-bottom:8px;
+                        color:#111827;
+                        font-size:32px;
+                        font-weight:700;
+                    ">
+                        Welcome Back
+                    </h2>
+
+                    <p style="
+                        color:#6B7280;
+                        font-size:16px;
+                        margin:0;
+                    ">
+                        Sign in to continue your learning journey.
+                    </p>
+                </div>
                     </div> 
                     """, unsafe_allow_html=True)
                 st.markdown("""
@@ -1466,10 +1467,20 @@ else:
 
                 """,
                   unsafe_allow_html=True)
-                username = st.text_input("User ID", placeholder="Enter User ID", key="login_username")
-                password = st.text_input("Password", type="password", placeholder="Enter Password", key="login_password")
+                username = st.text_input(
+                    "Username",
+                    placeholder="Enter your username",
+                    key="login_username"
+                )
+
+                password = st.text_input(
+                    "Password",
+                    type="password",
+                    placeholder="Enter your password",
+                    key="login_password"
+                )
                 
-                col_login, col_signup = st.columns([1,1], gap="large")
+                col_login, col_signup = st.columns(2)
                 
                 with col_login:
                     if st.button("🚀 Login", use_container_width=True):
