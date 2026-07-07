@@ -508,6 +508,9 @@ def display_dashboard(username):
         <h2 style="
         margin:0;
         color:#111827;
+        font-size:32px;
+        font-weight:700;
+        line-height:1.2;
         ">
         Welcome back, {user['full_name']} 👋
         </h2>
