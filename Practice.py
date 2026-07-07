@@ -527,7 +527,7 @@ def display_dashboard(username):
         color:#374151;
         margin:0;
         ">
-        "The secret of getting ahead is getting started."
+        Track your academic performance, predict future scores, and access personalized study resources from one place.
         </p>
 
         <p style="
