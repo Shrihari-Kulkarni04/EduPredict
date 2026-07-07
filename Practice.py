@@ -1391,8 +1391,28 @@ else:
         st.markdown("<br>", unsafe_allow_html=True)
 
 
-        st.markdown("### Trusted Learning Insights")
-        st.caption("Helping students track progress and improve performance.")
+        st.markdown("""
+        <div style="
+        padding:8px 0 18px 0;
+        ">
+        <h2 style="
+        margin:0;
+        color:#111827;
+        font-size:28px;
+        font-weight:700;
+        ">
+        Trusted Learning Insights
+        </h2>
+
+        <p style="
+        margin-top:8px;
+        font-size:16px;
+        color:#6B7280;
+        ">
+        Helping students track progress and improve performance.
+        </p>
+        </div>
+        """, unsafe_allow_html=True)
 
 
         stat1, stat2, stat3, stat4 = st.columns(4)
