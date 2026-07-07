@@ -599,8 +599,6 @@ margin:0;
 </div>
 """, unsafe_allow_html=True)
 
-                st.markdown("<br>", unsafe_allow_html=True)
-
 def create_marks_bar_graph(subject_scores):
     # Create a bar graph using plotly
     fig = go.Figure()
