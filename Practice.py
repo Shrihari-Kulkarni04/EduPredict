@@ -541,6 +541,17 @@ def display_dashboard(username):
         </div>
         """, unsafe_allow_html=True)
             
+            st.markdown("""
+            <h3 style="
+            color:#111827;
+            font-size:24px;
+            font-weight:700;
+            margin-top:5px;
+            margin-bottom:18px;
+            ">
+            Academic Overview
+            </h3>
+            """, unsafe_allow_html=True)
         # Dashboard Summary Cards
             subject_scores = st.session_state.get("subject_scores", {})
             analytics = compute_analytics(subject_scores)
