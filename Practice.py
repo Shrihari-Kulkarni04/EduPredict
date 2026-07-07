@@ -1307,12 +1307,12 @@ else:
                 border-radius:18px;
                 border:1px solid #e5e7eb;
                 min-height:220px;
-                box-shadow:0 10px 30px rgba(0,0,0,0.08);
+                box-shadow:0 4px 12px rgba(0,0,0,0.08);
                 transition:all .3s ease;
             ">
                 <h3 style="
                     color:#2563EB;
-                    font-size:28px;
+                    font-size:24px;
                     font-weight:700;
                     margin-bottom:18px;
                     ">
@@ -1330,17 +1330,19 @@ else:
             """, unsafe_allow_html=True)
 
         with col_b:
-            st.markdown("""
-            <div style="
-                background:white;
-                padding:20px;
-                border-radius:10px;
+                st.markdown("""
+                <div style="
+                background:#ffffff;
+                padding:24px;
+                border-radius:18px;
                 border:1px solid #e5e7eb;
-                height:200px;
-            ">
+                min-height:220px;
+                box-shadow:0 4px 12px rgba(0,0,0,0.08);
+                transition:all .3s ease;
+                ">
                 <h3 style="
                 color:#16A34A;
-                font-size:28px;
+                font-size:24px;
                 font-weight:700;
                 margin-bottom:18px;
                 ">
@@ -1359,16 +1361,18 @@ else:
 
         with col_c:
             st.markdown("""
-            <div style="
-                background:white;
-                padding:20px;
-                border-radius:10px;
+                <div style="
+                background:#ffffff;
+                padding:24px;
+                border-radius:18px;
                 border:1px solid #e5e7eb;
-                height:200px;
-            ">
+                min-height:220px;
+                box-shadow:0 4px 12px rgba(0,0,0,0.08);
+                transition:all .3s ease;
+                ">
                 <h3 style="
                 color:#EA580C;
-                font-size:28px;
+                font-size:24px;
                 font-weight:700;
                 margin-bottom:18px;
                 ">
