@@ -521,7 +521,11 @@ def display_dashboard(username):
         <b>Class:</b> {user['class_grade']}
         </p>
 
-        <hr style="margin:18px 0;">
+        <hr style="
+        margin:20px 0;
+        border:none;
+        border-top:1px solid #E5E7EB;
+        ">
 
         <p style="
         font-size:16px;
