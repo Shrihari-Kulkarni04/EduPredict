@@ -530,14 +530,6 @@ def display_dashboard(username):
         ">
         Track your academic performance, predict future scores, and access personalized study resources from one place.
         </p>
-
-        <p style="
-        margin-top:8px;
-        color:#9ca3af;
-        ">
-        — Mark Twain
-        </p>
-
         </div>
         """, unsafe_allow_html=True)
             
@@ -598,6 +590,8 @@ margin:0;
 
 </div>
 """, unsafe_allow_html=True)
+
+                st.markdown("<br>", unsafe_allow_html=True)
 
 def create_marks_bar_graph(subject_scores):
     # Create a bar graph using plotly
