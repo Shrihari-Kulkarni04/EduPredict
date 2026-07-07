@@ -444,8 +444,6 @@ def create_navigation():
         # Render dropdown overlay card when menu is shown
         if st.session_state.get("show_profile_menu"):
 
-            st.markdown("---")
-
             if st.button("✏️ Edit Profile", key="edit_profile_btn"):
                 st.session_state["show_profile_editor"] = True
                 st.session_state["show_profile_menu"] = False
