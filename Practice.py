@@ -1441,8 +1441,9 @@ else:
                     <h2 style="margin-bottom:8px; color:#111827; font-size:32px; font-weight:700;">
                         Welcome Back
                     </h2>
-
-                    <p>Sign in to continue your learning journey.</p>
+                    <p>
+                        Sign in to continue your learning journey.
+                    </p>
                 </div>
                 """, unsafe_allow_html=True)
                 st.markdown("""
