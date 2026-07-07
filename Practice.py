@@ -1437,30 +1437,16 @@ else:
         
             if st.session_state["page"] == "login":
                 st.markdown("""
-                    <div style="
-                        text-align:center;
-                        padding-bottom:15px;
-                    ">
-                        <div style="text-align:center;padding-bottom:18px;">
-                    <h2 style="
-                        margin-bottom:8px;
-                        color:#111827;
-                        font-size:32px;
-                        font-weight:700;
-                    ">
+                <div style="text-align:center; padding-bottom:18px;">
+                    <h2 style="margin-bottom:8px; color:#111827; font-size:32px; font-weight:700;">
                         Welcome Back
                     </h2>
 
-                    <p style="
-                        color:#6B7280;
-                        font-size:16px;
-                        margin:0;
-                    ">
+                    <p style="color:#6B7280; font-size:16px; margin:0;">
                         Sign in to continue your learning journey.
                     </p>
                 </div>
-                    </div> 
-                    """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
                 st.markdown("""
                     <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
                     𝓛𝓸𝓰𝓲𝓷
