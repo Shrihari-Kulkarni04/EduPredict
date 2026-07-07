@@ -486,7 +486,7 @@ def display_dashboard(username):
             # Welcome Section
             st.markdown(f"""
         <div style="
-        background:#ffffff;
+        background:linear-gradient(135deg,#ffffff,#f8fafc);
         padding:30px;
         border-radius:18px;
         border:1px solid #e5e7eb;
