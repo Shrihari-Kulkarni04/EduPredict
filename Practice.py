@@ -845,35 +845,31 @@ def render_analytics_page(subject_scores):
             min-height:190px;
             text-align:center;
         ">
-
-            <div style="font-size:38px;">📈</div>
-
-            <p style="
-            margin-top:12px;
-            margin-bottom:14px;
-            color:#6B7280;
-            font-size:16px;
-            font-weight:600;
-            ">
-            Average Score
-            </p>
-
-            <h1 style="
-            margin:0;
-            color:#2563EB;
-            font-size:42px;
-            font-weight:700;
-            ">
-            {analytics['average_score']}
-            </h1>
-
-            <p style="
-            margin-top:14px;
-            color:#9CA3AF;
-            font-size:14px;
-            ">
-            Overall Class Performance
-            </p>
+        <div style="font-size:38px;">📈</div>
+        <p style="
+        margin-top:12px;
+        margin-bottom:14px;
+        color:#6B7280;
+        font-size:16px;
+        font-weight:600;
+        ">
+        Average Score
+        </p>
+        <h1 style="
+        margin:0;
+        color:#2563EB;
+        font-size:42px;
+        font-weight:700;
+        ">
+        {analytics['average_score']}
+        </h1>
+        <p style="
+        margin-top:14px;
+        color:#9CA3AF;
+        font-size:14px;
+        ">
+        Overall Class Performance
+        </p>
 
         </div>
         """, unsafe_allow_html=True)
