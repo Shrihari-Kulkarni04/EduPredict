@@ -866,10 +866,10 @@ def render_analytics_page(subject_scores):
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown(
-    "<div style='margin-bottom:20px;'></div>",
-    unsafe_allow_html=True
-    )
+        st.markdown(
+        "<div style='margin-bottom:20px;'></div>",
+        unsafe_allow_html=True
+        )
 
     # Middle row charts
     c1, c2 = st.columns([2, 3])
