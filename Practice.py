@@ -866,7 +866,10 @@ def render_analytics_page(subject_scores):
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+    "<div style='margin-bottom:20px;'></div>",
+    unsafe_allow_html=True
+    )
 
     # Middle row charts
     c1, c2 = st.columns([2, 3])
@@ -1265,7 +1268,44 @@ def display_dashboard_page():
 
                     st.error(f"Weakest Subject: {lowest_subject}")
     elif st.session_state["current_page"] == "analytics":
-        st.title("Analytics Dashboard")
+        st.markdown("""
+        <div style="
+        background:linear-gradient(135deg,#ffffff,#f8fafc);
+        padding:28px;
+        border-radius:18px;
+        border:1px solid #e5e7eb;
+        box-shadow:0 8px 20px rgba(0,0,0,.08);
+        margin-bottom:25px;
+        ">
+        <p style="
+        color:#111827;
+        font-size:15px;
+        font-weight:700;
+        letter-spacing:1px;
+        text-transform:uppercase;
+        margin-bottom:8px;
+        ">
+        ANALYTICS
+        </p>
+
+        <h2 style="
+        margin:0;
+        font-size:32px;
+        font-weight:700;
+        color:#111827;
+        ">
+        Analytics Dashboard
+        </h2>
+
+        <p style="
+        margin-top:10px;
+        font-size:16px;
+        color:#6B7280;
+        ">
+        Visualize academic performance, identify trends, and gain actionable insights.
+        </p>
+        </div>
+        """, unsafe_allow_html=True)
         # Ensure subject_scores available
         subject_scores = st.session_state.get("subject_scores", {})
         render_analytics_page(subject_scores)
