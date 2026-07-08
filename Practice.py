@@ -738,6 +738,33 @@ def compute_analytics(subject_scores):
     # Flatten all scores and compute metrics
     if not subject_scores:
         return None
+    
+    predictions = st.session_state.get("predictions", {})
+
+    valid_predictions = [
+        p for p in predictions.values()
+        if isinstance(p, (int, float))
+    ]
+
+    predicted_score = (
+        round(sum(valid_predictions) / len(valid_predictions), 2)
+        if valid_predictions else "--"
+    )
+
+    improvement_rate = "--"
+
+    improvements = []
+
+    for scores in subject_scores.values():
+        if len(scores) >= 2:
+            previous = scores[-2]
+            current = scores[-1]
+
+            if previous != 0:
+                improvements.append(((current - previous) / previous) * 100)
+
+    if improvements:
+        improvement_rate = f"{round(sum(improvements) / len(improvements), 1)}%"
 
     subject_averages = {}
     all_scores = []
@@ -760,48 +787,134 @@ def compute_analytics(subject_scores):
     lowest_score = min(all_scores)
     subjects_needing_improvement = [s for s, a in subject_averages.items() if a < 75]
 
+    if average_score >= 90:
+        study_readiness = "Excellent"
+    elif average_score >= 80:
+        study_readiness = "High"
+    elif average_score >= 70:
+        study_readiness = "Moderate"
+    elif average_score >= 60:
+        study_readiness = "Needs Focus"
+    else:
+        study_readiness = "At Risk"
+
     return {
-        "average_score": average_score,
-        "strongest_subject": strongest_subject,
-        "weakest_subject": weakest_subject,
-        "total_subjects": total_subjects,
-        "highest_score": highest_score,
-        "lowest_score": lowest_score,
-        "subject_averages": subject_averages,
-        "subjects_needing_improvement": subjects_needing_improvement,
+    "average_score": average_score,
+    "strongest_subject": strongest_subject,
+    "weakest_subject": weakest_subject,
+    "total_subjects": total_subjects,
+    "highest_score": highest_score,
+    "lowest_score": lowest_score,
+    "subject_averages": subject_averages,
+    "subjects_needing_improvement": subjects_needing_improvement,
+
+    "predicted_score": predicted_score,
+    "study_readiness": study_readiness,
+    "improvement_rate": improvement_rate,
     }
 
 
 def build_subject_avg_bar_chart(subject_averages):
-    subjects = list(subject_averages.keys())
-    averages = [subject_averages[s] for s in subjects]
-    fig = go.Figure(go.Bar(x=subjects, y=averages, marker_color='rgb(55, 83, 109)'))
-    fig.update_layout(
-        title_text='Subject-wise Average Score',
-        xaxis_title='Subjects',
-        yaxis_title='Average Score',
-        yaxis=dict(range=[0, 100]),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+    import plotly.express as px
+
+    # Sort subjects by average score (Highest → Lowest)
+    sorted_data = sorted(
+        subject_averages.items(),
+        key=lambda x: x[1],
+        reverse=True
     )
+
+    subjects = [item[0] for item in sorted_data]
+    averages = [item[1] for item in sorted_data]
+
+    fig = px.bar(
+    x=averages,
+    y=subjects,
+    orientation="h",
+    text=[f"{score:.1f}" for score in averages],
+    color=subjects,
+    color_discrete_sequence=[
+        "#2563EB",  # Blue
+        "#16A34A",  # Green
+        "#F59E0B",  # Amber
+        "#DC2626",  # Red
+        "#7C3AED",  # Purple
+        "#06B6D4",  # Cyan
+        "#EA580C",  # Orange
+        "#EC4899"   # Pink
+    ]
+    )
+
+    fig.update_layout(
+        title={
+            "text": "📊 Subject Performance Ranking",
+            "x": 0.02,
+            "font": {"size": 20}
+        },
+        xaxis_title="Average Score",
+        yaxis_title="",
+        xaxis=dict(range=[0, 100]),
+        coloraxis_showscale=False,
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        height=430,
+        margin=dict(l=20, r=20, t=60, b=20)
+    )
+
     return fig
 
 
-def build_performance_trend_line_chart(subject_scores):
+def build_current_vs_predicted_chart(subject_averages, predictions):
+
+    import plotly.graph_objects as go
+
+    subjects = list(subject_averages.keys())
+
+    current_scores = [
+        subject_averages.get(subject, 0)
+        for subject in subjects
+    ]
+
+    predicted_scores = [
+        predictions.get(subject, 0)
+        if isinstance(predictions.get(subject), (int, float))
+        else 0
+        for subject in subjects
+    ]
+
     fig = go.Figure()
-    for subject, scores in subject_scores.items():
-        if scores:
-            x = list(range(1, len(scores) + 1))
-            fig.add_trace(go.Scatter(x=x, y=scores, mode='lines+markers', name=subject))
+
+    fig.add_trace(go.Bar(
+        name="Current",
+        x=subjects,
+        y=current_scores,
+        marker_color="#2563EB"
+    ))
+
+    fig.add_trace(go.Bar(
+        name="Predicted",
+        x=subjects,
+        y=predicted_scores,
+        marker_color="#16A34A"
+    ))
+
     fig.update_layout(
-        title_text='Performance Trend by Entry (per Subject)',
-        xaxis_title='Entry Number',
-        yaxis_title='Score',
+        title="🤖 Current vs Predicted Performance",
+        barmode="group",
         yaxis=dict(range=[0, 100]),
-        legend_title='Subject',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        xaxis_title="Subjects",
+        yaxis_title="Score",
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        height=430,
+        legend=dict(
+            orientation="h",
+            y=1.1,
+            x=0.5,
+            xanchor="center"
+        )
     )
+
     return fig
 
 
@@ -814,7 +927,14 @@ def build_score_distribution_pie_chart(subject_averages):
 
 
 def render_analytics_page(subject_scores):
+    if (
+        "predictions" not in st.session_state
+        or st.session_state["predictions"] is None
+    ):
+        st.session_state["predictions"] = train_and_predict(subject_scores)
+
     analytics = compute_analytics(subject_scores)
+
     if analytics is None:
         st.info("No performance data available.")
         return
@@ -877,52 +997,157 @@ def render_analytics_page(subject_scores):
     with k2:
         st.markdown(f"""
         <div style="
-            background:white;
-            padding:20px;
-            border-radius:15px;
+            background:#ffffff;
+            padding:28px;
+            border-radius:18px;
+            border:1px solid #E5E7EB;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            min-height:190px;
             text-align:center;
-            box-shadow:0 4px 12px rgba(0,0,0,0.08);
-            border:1px solid #e5e7eb;
         ">
-            <h4>🏆 Strongest Subject</h4>
-            <h2>{analytics['strongest_subject']}</h2>
+
+        <div style="font-size:38px;">🏆</div>
+
+        <p style="
+        margin-top:12px;
+        margin-bottom:14px;
+        color:#6B7280;
+        font-size:16px;
+        font-weight:600;
+        ">
+        Strongest Subject
+        </p>
+
+        <h1 style="
+        margin:0;
+        color:#16A34A;
+        font-size:36px;
+        font-weight:700;
+        min-height:52px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        ">
+        {analytics['strongest_subject']}
+        </h1>
+
+        <p style="
+        margin-top:14px;
+        color:#9CA3AF;
+        font-size:14px;
+        ">
+        Best Academic Achievement
+        </p>
+
         </div>
         """, unsafe_allow_html=True)
 
     with k3:
         st.markdown(f"""
         <div style="
-            background:white;
-            padding:20px;
-            border-radius:15px;
+            background:#ffffff;
+            padding:28px;
+            border-radius:18px;
+            border:1px solid #E5E7EB;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            min-height:190px;
             text-align:center;
-            box-shadow:0 4px 12px rgba(0,0,0,0.08);
-            border:1px solid #e5e7eb;
         ">
-            <h4>⚠️ Weakest Subject</h4>
-            <h2>{analytics['weakest_subject']}</h2>
+
+        <div style="font-size:38px;">⚠️</div>
+
+        <p style="
+        margin-top:12px;
+        margin-bottom:14px;
+        color:#6B7280;
+        font-size:16px;
+        font-weight:600;
+        ">
+        Weakest Subject
+        </p>
+
+        <h1 style="
+        margin:0;
+        color:#DC2626;
+        font-size:36px;
+        font-weight:700;
+        min-height:52px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        ">
+        {analytics['weakest_subject']}
+        </h1>
+
+        <p style="
+        margin-top:14px;
+        color:#9CA3AF;
+        font-size:14px;
+        ">
+        Needs Attention
+        </p>
+
         </div>
         """, unsafe_allow_html=True)
 
     with k4:
         st.markdown(f"""
         <div style="
-            background:white;
-            padding:20px;
-            border-radius:15px;
+            background:#ffffff;
+            padding:28px;
+            border-radius:18px;
+            border:1px solid #E5E7EB;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            min-height:190px;
             text-align:center;
-            box-shadow:0 4px 12px rgba(0,0,0,0.08);
-            border:1px solid #e5e7eb;
         ">
-            <h4>📚 Total Subjects</h4>
-            <h2>{analytics['total_subjects']}</h2>
+
+        <div style="font-size:38px;">📚</div>
+
+        <p style="
+        margin-top:12px;
+        margin-bottom:14px;
+        color:#6B7280;
+        font-size:16px;
+        font-weight:600;
+        ">
+        Total Subjects
+        </p>
+
+        <h1 style="
+        margin:0;
+        color:#7C3AED;
+        font-size:42px;
+        font-weight:700;
+        min-height:52px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        ">
+        {analytics['total_subjects']}
+        </h1>
+
+        <p style="
+        margin-top:14px;
+        color:#9CA3AF;
+        font-size:14px;
+        ">
+        Subjects Being Tracked
+        </p>
+
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown(
-        "<div style='margin-bottom:20px;'></div>",
-        unsafe_allow_html=True
-        )
+    st.markdown("""
+    <h3 style="
+    color:#111827;
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:18px;
+    "><br><br><br>
+    Performance Analytics
+    </h3>
+    """, unsafe_allow_html=True)
 
     # Middle row charts
     c1, c2 = st.columns([2, 3])
@@ -930,24 +1155,99 @@ def render_analytics_page(subject_scores):
         fig_bar = build_subject_avg_bar_chart(analytics['subject_averages'])
         st.plotly_chart(fig_bar, use_container_width=True)
     with c2:
-        fig_line = build_performance_trend_line_chart(subject_scores)
-        st.plotly_chart(fig_line, use_container_width=True)
+        fig_compare = build_current_vs_predicted_chart(
+            analytics["subject_averages"],
+            st.session_state["predictions"]
+        )
+        st.plotly_chart(fig_compare, use_container_width=True)
 
     # Bottom row insights and pie chart
     b1, b2 = st.columns([3, 2])
     with b1:
-        st.subheader("Insights")
-        st.write(f"**Highest Score Achieved:** {analytics['highest_score']}")
-        st.write(f"**Lowest Score Achieved:** {analytics['lowest_score']}")
-        st.write(f"**Strongest Subject:** {analytics['strongest_subject']}")
-        st.write(f"**Weakest Subject:** {analytics['weakest_subject']}")
-        if analytics['subjects_needing_improvement']:
-            st.warning("Subjects Needing Improvement (avg < 75): " + ", ".join(analytics['subjects_needing_improvement']))
+
+        st.markdown("## 📚 Study Readiness Report")
+
+        readiness = analytics["study_readiness"]
+
+        if readiness == "Excellent":
+            badge = "🟢 Excellent"
+        elif readiness == "High":
+            badge = "🟢 High"
+        elif readiness == "Moderate":
+            badge = "🟡 Moderate"
+        elif readiness == "Needs Focus":
+            badge = "🟠 Needs Focus"
         else:
-            st.success("No subjects need immediate improvement (all averages >= 75).")
+            badge = "🔴 At Risk"
+
+        focus_subject = analytics["weakest_subject"]
+
+        recommendation = {
+            "Excellent": "Maintain your consistency and continue solving advanced questions.",
+            "High": "Keep practicing regularly and strengthen weaker subjects.",
+            "Moderate": "Increase weekly revision and focus on concept clarity.",
+            "Needs Focus": "Create a structured study schedule and practice daily.",
+            "At Risk": "Immediate attention required. Focus on fundamentals first."
+        }
+
+        st.metric("Overall Score", f"{analytics['average_score']}%")
+        st.metric("Predicted Score", f"{analytics['predicted_score']}%")
+
+        st.info(f"### Readiness Level\n{badge}")
+
+        st.warning(f"### Focus Subject\n{focus_subject}")
+
+        st.success(
+            f"### Recommendation\n\n{recommendation[readiness]}"
+        )
+        def build_improvement_trend_chart(subject_scores):
+
+            import plotly.graph_objects as go
+
+            averages = []
+
+            max_entries = max((len(scores) for scores in subject_scores.values()), default=0)
+
+            for i in range(max_entries):
+                current = []
+
+                for scores in subject_scores.values():
+                    if i < len(scores):
+                        current.append(scores[i])
+
+                if current:
+                    averages.append(round(sum(current) / len(current), 2))
+
+            if not averages:
+                averages = [0]
+
+            attempts = [f"Attempt {i+1}" for i in range(len(averages))]
+
+            fig = go.Figure()
+
+            fig.add_trace(go.Scatter(
+                x=attempts,
+                y=averages,
+                mode="lines+markers",
+                fill="tozeroy",
+                line=dict(color="#2563EB", width=4),
+                marker=dict(size=9)
+            ))
+
+            fig.update_layout(
+                title="📈 Improvement Trend",
+                xaxis_title="Attempts",
+                yaxis_title="Average Score",
+                yaxis=dict(range=[0,100]),
+                plot_bgcolor="white",
+                paper_bgcolor="white",
+                height=420
+            )
+
+            return fig
     with b2:
-        fig_pie = build_score_distribution_pie_chart(analytics['subject_averages'])
-        st.plotly_chart(fig_pie, use_container_width=True)
+        fig_trend = build_improvement_trend_chart(subject_scores)
+        st.plotly_chart(fig_trend, use_container_width=True)
 
 
 def display_dashboard_page():
