@@ -26,11 +26,28 @@ users_collection = db["users"]
 
 users_collection = db["users"]
 
-users_collection.create_index(
-    [("createdAt", 1)],
-    expireAfterSeconds=1728000,
-    name="ttl_20_days"
-)
+TTL_SECONDS = 20 * 24 * 60 * 60  # 20 days
+
+indexes = users_collection.index_information()
+
+ttl_index_name = None
+
+for name, info in indexes.items():
+    if info.get("key") == [("createdAt", 1)]:
+        ttl_index_name = name
+        current_ttl = info.get("expireAfterSeconds")
+
+        if current_ttl != TTL_SECONDS:
+            users_collection.drop_index(name)
+            ttl_index_name = None
+        break
+
+if ttl_index_name is None:
+    users_collection.create_index(
+        [("createdAt", 1)],
+        expireAfterSeconds=TTL_SECONDS,
+        name="ttl_20_days"
+    )
 
 users_collection.create_index(
     [("username", 1)],
@@ -804,20 +821,60 @@ def render_analytics_page(subject_scores):
 
     # Top row KPI Cards
 
+    st.markdown("""
+    <h3 style="
+    color:#111827;
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:18px;
+    ">
+    Academic Summary
+    </h3>
+    """, unsafe_allow_html=True)
+
     k1, k2, k3, k4 = st.columns(4)
 
     with k1:
         st.markdown(f"""
         <div style="
-            background:white;
-            padding:20px;
-            border-radius:15px;
+            background:#ffffff;
+            padding:28px;
+            border-radius:18px;
+            border:1px solid #E5E7EB;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            min-height:190px;
             text-align:center;
-            box-shadow:0 4px 12px rgba(0,0,0,0.08);
-            border:1px solid #e5e7eb;
         ">
-            <h4>📈 Average Score</h4>
-            <h2>{analytics['average_score']}</h2>
+
+            <div style="font-size:38px;">📈</div>
+
+            <p style="
+            margin-top:12px;
+            margin-bottom:14px;
+            color:#6B7280;
+            font-size:16px;
+            font-weight:600;
+            ">
+            Average Score
+            </p>
+
+            <h1 style="
+            margin:0;
+            color:#2563EB;
+            font-size:42px;
+            font-weight:700;
+            ">
+            {analytics['average_score']}
+            </h1>
+
+            <p style="
+            margin-top:14px;
+            color:#9CA3AF;
+            font-size:14px;
+            ">
+            Overall Class Performance
+            </p>
+
         </div>
         """, unsafe_allow_html=True)
 
