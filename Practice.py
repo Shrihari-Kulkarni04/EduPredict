@@ -1,5 +1,3 @@
-from tkinter import font
-
 from dotenv import load_dotenv
 import base64
 import html
