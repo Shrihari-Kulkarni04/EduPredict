@@ -10,6 +10,7 @@ import bcrypt
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+import streamlit.components.v1 as components
 
 # Set page config at the beginning
 st.set_page_config(page_title="EduPredict", layout="wide")
@@ -1351,6 +1352,11 @@ def display_dashboard_page():
         display_dashboard(st.session_state.get("username", ""))
     elif st.session_state["current_page"] == "performance":
         st.title("Performance History")
+
+        # Get user's class grade
+        user = st.session_state.get("user")
+        class_grade = user.get("class_grade", "") if user else ""
+        subjects = get_subjects_for_grade(class_grade) if user else []
        
         all_scores = {
             subject: sum(scores) / len(scores)
@@ -1503,13 +1509,7 @@ def display_dashboard_page():
             🚀 Start by clicking **Add Score** below.
             """)
             
-        # Get user's class grade
-        user = st.session_state.get("user")
-
         if user:
-            class_grade = user.get("class_grade", "")
-            subjects = get_subjects_for_grade(class_grade)
-
             # Display the bar chart with recent entries if scores exist
             if st.session_state["subject_scores"]:
                 st.subheader("Recent Performance")
@@ -1539,29 +1539,138 @@ def display_dashboard_page():
 
                 df = pd.DataFrame(table_data)
 
-                st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True
-            )
-        else:
-            st.info("No scores available yet. Click 'Add Score' to record your first marks.")
+                table_html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <style>
 
-            col1, col2 = st.columns(2)
-            
-            # Add Score Button and Form
-            with col1:
-                if st.button("Add Score", key="add_score_btn"):
-                    st.session_state["show_add_form"] = True
-                    st.session_state["show_change_form"] = False
+                body{
+                    margin:0;
+                    padding:15px;
+                    font-family:Arial, sans-serif;
+                    background:white;
+                }
+                table{
+                    width:100%;
+                    border-collapse:collapse;
+                    border:1px solid #D1D5DB;
+                    border-radius:12px;
+                    overflow:hidden;
+                    box-shadow:0 6px 18px rgba(0,0,0,.08);
+                }
 
-            # Change Subject Marks Button and Form
-            with col2:
+                tbody tr:last-child td{
+                    border-bottom:1px solid #D1D5DB;
+                }
+
+                td:first-child,
+                th:first-child{
+                    border-left:1px solid #D1D5DB;
+                }
+
+                td:last-child,
+                th:last-child{
+                    border-right:1px solid #D1D5DB;
+                }
+
+                th{
+                    background:#2563EB;
+                    color:white;
+                    padding:14px;
+                    text-align:center;
+                    font-size:16px;
+                    background:#2563EB;
+                    color:white;
+                    padding:14px;
+                    text-align:center;
+                    border:1px solid #D1D5DB;
+                    font-size:16px;
+                }
+
+                td{
+                    padding:12px;
+                    text-align:center;
+                    border-bottom:1px solid #E5E7EB;
+                    font-size:15px;
+                    padding:12px;
+                    text-align:center;
+                    border:1px solid #E1D5DB;
+                    font-size:15px;
+                }
+
+                tr:nth-child(even){
+                    background:#F9FAFB;
+                }
+
+                tr:hover{
+                    background:#EEF4FF;
+                }
+
+                </style>
+                </head>
+
+                <body>
+
+                <table>
+
+                <thead>
+                <tr>
+                <th>Subject</th>
+                <th>Entry 1</th>
+                <th>Entry 2</th>
+                <th>Entry 3</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                """
+
+                for row in table_data:
+
+                    table_html += f"""
+                <tr>
+                <td>{row['Subject']}</td>
+                <td>{row['Entry 1']}</td>
+                <td>{row['Entry 2']}</td>
+                <td>{row['Entry 3']}</td>
+                </tr>
+                """
+
+                table_html += """
+                </tbody>
+
+                </table>
+                </div>
+                </body>
+                </html>
+                """
+
+                components.html(
+                    table_html,
+                    height=270,
+                    scrolling=False
+                )
+
+                st.markdown("<br><br>", unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        
+        # Add Score Button and Form
+        with col1:
+            if st.button("Add Score", key="add_score_btn"):
+                st.session_state["show_add_form"] = True
+                st.session_state["show_change_form"] = False
+
+        # Change Subject Marks Button and Form
+        with col2:
+            if st.session_state["subject_scores"]:
                 if st.button("Change Subject Marks", key="change_marks_btn"):
                     st.session_state["show_change_form"] = True
                     st.session_state["show_add_form"] = False
+            else:
+                st.info("No scores available yet.")
 
-            # Add Score Form
+        # Add Score Form
         if st.session_state.get("show_add_form", False):
             with st.form("add_score_form"):
                 st.subheader("Add New Scores")
@@ -1581,28 +1690,30 @@ def display_dashboard_page():
                     st.session_state["show_add_form"] = False
                     st.rerun()
 
-            # Change Subject Marks Form
-            if st.session_state.get("show_change_form", False):
-                with st.form("change_marks_form"):
-                    st.subheader("Change Subject Marks")
-                    subject_to_change = st.selectbox("Select Subject", subjects)
-                    if subject_to_change in st.session_state["subject_scores"] and len(st.session_state["subject_scores"][subject_to_change]) > 0:
-                        entry_index = st.selectbox("Select Entry to Change", 
-                                                range(1, len(st.session_state["subject_scores"][subject_to_change]) + 1),
-                                                format_func=lambda x: f"Entry {x}")
-                        new_score = st.number_input("New Score", min_value=0, max_value=100, 
-                                                value=st.session_state["subject_scores"][subject_to_change][entry_index-1])
-                        submitted = st.form_submit_button("Update Score")
-                        if submitted:
-                            st.session_state["subject_scores"][subject_to_change][entry_index-1] = new_score
-                            # Save updated scores to MongoDB
-                            save_scores_to_mongodb(st.session_state.get("username", ""), st.session_state["subject_scores"])
-                            st.success(f"Score updated successfully for {subject_to_change}!")
-                            st.session_state["show_change_form"] = False
-                            st.rerun()
-                    else:
-                        st.warning("No scores available for this subject yet.")
-                        st.form_submit_button("Close", disabled=True)
+        # Change Subject Marks Form
+        if st.session_state.get("show_change_form", False):
+            with st.form("change_marks_form"):
+                st.subheader("Change Subject Marks")
+                subject_to_change = st.selectbox("Select Subject", subjects)
+                if subject_to_change in st.session_state["subject_scores"] and len(st.session_state["subject_scores"][subject_to_change]) > 0:
+                    entry_index = st.selectbox("Select Entry to Change", 
+                                            range(1, len(st.session_state["subject_scores"][subject_to_change]) + 1),
+                                            format_func=lambda x: f"Entry {x}")
+                    new_score = st.number_input("New Score", min_value=0, max_value=100, 
+                                            value=st.session_state["subject_scores"][subject_to_change][entry_index-1])
+                    submitted = st.form_submit_button("Update Score")
+                    if submitted:
+                        st.session_state["subject_scores"][subject_to_change][entry_index-1] = new_score
+                        # Save updated scores to MongoDB
+                        save_scores_to_mongodb(st.session_state.get("username", ""), st.session_state["subject_scores"])
+                        st.success(f"Score updated successfully for {subject_to_change}!")
+                        st.session_state["show_change_form"] = False
+                        st.rerun()
+                else:
+                    st.warning("No scores available for this subject yet.")
+                    st.form_submit_button("Close", disabled=True)
+        else: 
+            st.markdown("<br><br><br>", unsafe_allow_html=True)
     elif st.session_state["current_page"] == "study":
         st.title("Study Material")
         
