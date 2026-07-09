@@ -1,5 +1,3 @@
-from tkinter import font
-
 from dotenv import load_dotenv
 import base64
 import html
@@ -1519,10 +1517,49 @@ def display_dashboard_page():
                 st.plotly_chart(fig, use_container_width=True)
 
                 # Display the numerical data
-                st.subheader("Score History")
+                import pandas as pd
+
+                st.subheader("📋 Score History")
+
+                table_data = []
+
                 for subject, scores in st.session_state["subject_scores"].items():
+
                     recent_scores = scores[-3:] if len(scores) >= 3 else scores
-                    st.write(f"{subject}: {', '.join(map(str, recent_scores))}")
+
+                    while len(recent_scores) < 3:
+                        recent_scores.insert(0, "-")
+
+                    table_data.append({
+                        "Subject": subject,
+                        "Entry 1": recent_scores[0],
+                        "Entry 2": recent_scores[1],
+                        "Entry 3": recent_scores[2]
+                    })
+
+                df = pd.DataFrame(table_data)
+
+                styled_df = (
+                df.style
+                .hide(axis="index")
+                .set_properties(**{
+                    "text-align": "center"
+                })
+                .set_table_styles([
+                    {
+                        "selector": "th",
+                        "props": [
+                            ("text-align", "center"),
+                            ("font-weight", "bold")
+                        ]
+                    }
+                ])
+            )
+
+            st.dataframe(
+                styled_df,
+                use_container_width=True
+            )
 
             # Add buttons in columns
             col1, col2 = st.columns(2)
