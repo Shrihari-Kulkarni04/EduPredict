@@ -1549,7 +1549,6 @@ def display_dashboard_page():
         else:
             st.info("No scores available yet. Click 'Add Score' to record your first marks.")
 
-            # Add buttons in columns
             col1, col2 = st.columns(2)
             
             # Add Score Button and Form
