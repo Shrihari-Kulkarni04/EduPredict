@@ -807,7 +807,6 @@ def compute_analytics(subject_scores):
     "lowest_score": lowest_score,
     "subject_averages": subject_averages,
     "subjects_needing_improvement": subjects_needing_improvement,
-
     "predicted_score": predicted_score,
     "study_readiness": study_readiness,
     "improvement_rate": improvement_rate,
@@ -965,30 +964,34 @@ def render_analytics_page(subject_scores):
             min-height:190px;
             text-align:center;
         ">
-        <div style="font-size:38px;">📈</div>
+
+        <div style="font-size:38px;">🎯</div>
+
         <p style="
-        margin-top:12px;
-        margin-bottom:14px;
-        color:#6B7280;
-        font-size:16px;
-        font-weight:600;
+            margin-top:12px;
+            margin-bottom:14px;
+            color:#6B7280;
+            font-size:16px;
+            font-weight:600;
         ">
-        Average Score
+        Overall Score
         </p>
+
         <h1 style="
-        margin:0;
-        color:#2563EB;
-        font-size:42px;
-        font-weight:700;
+            margin:0;
+            color:#2563EB;
+            font-size:42px;
+            font-weight:700;
         ">
-        {analytics['average_score']}
+        {analytics['average_score']}%
         </h1>
+
         <p style="
-        margin-top:14px;
-        color:#9CA3AF;
-        font-size:14px;
+            margin-top:14px;
+            color:#9CA3AF;
+            font-size:14px;
         ">
-        Overall Class Performance
+        Current Academic Performance
         </p>
 
         </div>
@@ -1006,37 +1009,37 @@ def render_analytics_page(subject_scores):
             text-align:center;
         ">
 
-        <div style="font-size:38px;">🏆</div>
+        <div style="font-size:38px;">🤖</div>
 
         <p style="
-        margin-top:12px;
-        margin-bottom:14px;
-        color:#6B7280;
-        font-size:16px;
-        font-weight:600;
+            margin-top:12px;
+            margin-bottom:14px;
+            color:#6B7280;
+            font-size:16px;
+            font-weight:600;
         ">
-        Strongest Subject
+        Predicted Score
         </p>
 
         <h1 style="
-        margin:0;
-        color:#16A34A;
-        font-size:36px;
-        font-weight:700;
-        min-height:52px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
+            margin:0;
+            color:#16A34A;
+            font-size:42px;
+            font-weight:700;
+            min-height:52px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
         ">
-        {analytics['strongest_subject']}
+        {analytics['predicted_score']}%
         </h1>
 
         <p style="
-        margin-top:14px;
-        color:#9CA3AF;
-        font-size:14px;
+            margin-top:14px;
+            color:#9CA3AF;
+            font-size:14px;
         ">
-        Best Academic Achievement
+        AI Estimated Performance
         </p>
 
         </div>
@@ -1054,37 +1057,37 @@ def render_analytics_page(subject_scores):
             text-align:center;
         ">
 
-        <div style="font-size:38px;">⚠️</div>
+        <div style="font-size:38px;">📚</div>
 
         <p style="
-        margin-top:12px;
-        margin-bottom:14px;
-        color:#6B7280;
-        font-size:16px;
-        font-weight:600;
+            margin-top:12px;
+            margin-bottom:14px;
+            color:#6B7280;
+            font-size:16px;
+            font-weight:600;
         ">
-        Weakest Subject
+        Study Readiness
         </p>
 
         <h1 style="
-        margin:0;
-        color:#DC2626;
-        font-size:36px;
-        font-weight:700;
-        min-height:52px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
+            margin:0;
+            color:#F59E0B;
+            font-size:36px;
+            font-weight:700;
+            min-height:52px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
         ">
-        {analytics['weakest_subject']}
+        {analytics['study_readiness']}
         </h1>
 
         <p style="
-        margin-top:14px;
-        color:#9CA3AF;
-        font-size:14px;
+            margin-top:14px;
+            color:#9CA3AF;
+            font-size:14px;
         ">
-        Needs Attention
+        Current Learning Status
         </p>
 
         </div>
@@ -1099,40 +1102,45 @@ def render_analytics_page(subject_scores):
             border:1px solid #E5E7EB;
             box-shadow:0 8px 20px rgba(0,0,0,.08);
             min-height:190px;
-            text-align:center;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
         ">
 
-        <div style="font-size:38px;">📚</div>
+        <div style="font-size:38px;">⬆️</div>
 
         <p style="
-        margin-top:12px;
-        margin-bottom:14px;
-        color:#6B7280;
-        font-size:16px;
-        font-weight:600;
+            margin-top:12px;
+            margin-bottom:14px;
+            color:#6B7280;
+            font-size:16px;
+            font-weight:600;
         ">
-        Total Subjects
+        Improvement Rate
         </p>
 
         <h1 style="
-        margin:0;
-        color:#7C3AED;
-        font-size:42px;
-        font-weight:700;
-        min-height:52px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
+            margin:0;
+            width:100%;
+            color:#7C3AED;
+            font-size:42px;
+            font-weight:700;
+            min-height:52px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
         ">
-        {analytics['total_subjects']}
+            {analytics['improvement_rate']}
         </h1>
 
         <p style="
-        margin-top:14px;
-        color:#9CA3AF;
-        font-size:14px;
+            margin-top:14px;
+            color:#9CA3AF;
+            font-size:14px;
         ">
-        Subjects Being Tracked
+        Growth Since Last Entry
         </p>
 
         </div>
