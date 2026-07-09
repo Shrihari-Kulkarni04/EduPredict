@@ -1,3 +1,5 @@
+from tkinter import font
+
 from dotenv import load_dotenv
 import base64
 import html
@@ -1539,27 +1541,13 @@ def display_dashboard_page():
 
                 df = pd.DataFrame(table_data)
 
-                styled_df = (
-                df.style
-                .hide(axis="index")
-                .set_properties(**{
-                    "text-align": "center"
-                })
-                .set_table_styles([
-                    {
-                        "selector": "th",
-                        "props": [
-                            ("text-align", "center"),
-                            ("font-weight", "bold")
-                        ]
-                    }
-                ])
+                st.dataframe(
+                df,
+                use_container_width=True,
+                hide_index=True
             )
-
-            st.dataframe(
-                styled_df,
-                use_container_width=True
-            )
+        else:
+            st.info("No scores available yet. Click 'Add Score' to record your first marks.")
 
             # Add buttons in columns
             col1, col2 = st.columns(2)
