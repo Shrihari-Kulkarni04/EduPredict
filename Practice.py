@@ -1562,24 +1562,24 @@ def display_dashboard_page():
                     st.session_state["show_add_form"] = False
 
             # Add Score Form
-            if st.session_state.get("show_add_form", False):
-                with st.form("add_score_form"):
-                    st.subheader("Add New Scores")
-                    scores_to_add = {}
-                    for subject in subjects:
-                        scores_to_add[subject] = st.number_input(f"{subject} Score", min_value=0, max_value=100, value=0, key=f"add_{subject}_score")
-                    submitted = st.form_submit_button("Submit New Scores")
-                    if submitted:
-                        for subject, score in scores_to_add.items():
-                            if isinstance(st.session_state["subject_scores"].get(subject), list):
-                                st.session_state["subject_scores"][subject].append(score)
-                            else:
-                                st.session_state["subject_scores"][subject] = [score]
-                        # Save scores to MongoDB
-                        save_scores_to_mongodb(st.session_state.get("username", ""), st.session_state["subject_scores"])
-                        st.success("Scores added successfully!")
-                        st.session_state["show_add_form"] = False
-                        st.rerun()
+        if st.session_state.get("show_add_form", False):
+            with st.form("add_score_form"):
+                st.subheader("Add New Scores")
+                scores_to_add = {}
+                for subject in subjects:
+                    scores_to_add[subject] = st.number_input(f"{subject} Score", min_value=0, max_value=100, value=0, key=f"add_{subject}_score")
+                submitted = st.form_submit_button("Submit New Scores")
+                if submitted:
+                    for subject, score in scores_to_add.items():
+                        if isinstance(st.session_state["subject_scores"].get(subject), list):
+                            st.session_state["subject_scores"][subject].append(score)
+                        else:
+                            st.session_state["subject_scores"][subject] = [score]
+                    # Save scores to MongoDB
+                    save_scores_to_mongodb(st.session_state.get("username", ""), st.session_state["subject_scores"])
+                    st.success("Scores added successfully!")
+                    st.session_state["show_add_form"] = False
+                    st.rerun()
 
             # Change Subject Marks Form
             if st.session_state.get("show_change_form", False):
