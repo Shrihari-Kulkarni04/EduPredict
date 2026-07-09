@@ -1,3 +1,5 @@
+from tkinter import font
+
 from dotenv import load_dotenv
 import base64
 import html
@@ -326,7 +328,7 @@ def render_profile_editor(user):
         return
 
     if st.session_state.pop("profile_update_success", False):
-        st.success("Profile updated successfully.")
+        st.toast("✅ Profile updated successfully!")
 
     profile_src = html.escape(get_profile_picture_src(user), quote=True)
     safe_name = html.escape(user.get("full_name", "User"))
@@ -335,12 +337,56 @@ def render_profile_editor(user):
 
     st.markdown(
         f"""
-        <div class="profile-summary">
-            <img src="{profile_src}" alt="Profile picture">
-            <div>
-                <strong>{safe_name}</strong>
-                <span>Class {safe_class} | @{safe_username}</span>
-            </div>
+        <div style="
+            background:#ffffff;
+            border:1px solid #E5E7EB;
+            border-radius:18px;
+            padding:24px;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            display:flex;
+            align-items:center;
+            gap:20px;
+            margin-bottom:25px;
+        ">
+
+        <img src="{profile_src}"
+        style="
+            width:90px;
+            height:90px;
+            border-radius:50%;
+            object-fit:cover;
+            border:3px solid #2563EB;
+        ">
+
+        <div>
+
+        <h3 style="
+            margin:0;
+            color:#111827;
+        ">
+        {safe_name}
+        </h3>
+
+        <p style="
+            margin:6px 0;
+            color:#6B7280;
+        ">
+            @{safe_username}
+        </p>
+
+        <span style="
+            background:#EEF2FF;
+            color:#2563EB;
+            padding:6px 12px;
+            border-radius:20px;
+            font-size:13px;
+            font-weight:600;
+        ">
+            Class {safe_class}
+        </span>
+
+        </div>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -351,11 +397,21 @@ def render_profile_editor(user):
 
     with st.form("profile_edit_form"):
 
-        full_name = st.text_input(
-            "Name",
-            value=user.get("full_name", ""),
-            key="profile_full_name"
-        )
+        col1, col2 = st.columns(2)
+
+        with col1:
+            full_name = st.text_input(
+                "Full Name",
+                value=user.get("full_name", ""),
+                key="profile_full_name"
+            )
+
+        with col2:
+            new_username = st.text_input(
+                "Username",
+                value=user.get("username", ""),
+                key="profile_username"
+            )
 
         class_grade = st.selectbox(
             "Class",
@@ -364,14 +420,10 @@ def render_profile_editor(user):
             key="profile_class"
         )
 
-        new_username = st.text_input(
-            "Username",
-            value=user.get("username", ""),
-            key="profile_username"
-        )
+        st.markdown("### Profile Picture")
 
         uploaded_file = st.file_uploader(
-            "Profile picture",
+            "Upload a new profile picture",
             type=["png", "jpg", "jpeg", "webp"],
             key="profile_picture_upload"
         )
@@ -383,7 +435,13 @@ def render_profile_editor(user):
             key="remove_profile_picture"
         )
 
-        submitted = st.form_submit_button("Save Profile")
+        left, center, right = st.columns([3, 2, 3])
+
+        with center:
+            submitted = st.form_submit_button(
+                "Save Profile",
+                use_container_width=True
+            )
         
     if submitted:
         save_profile_changes(user, full_name, class_grade, new_username, uploaded_file, remove_profile_pic)
@@ -1305,24 +1363,132 @@ def display_dashboard_page():
         if all_scores:
 
             st.markdown(f"""
-            ### 👋 Welcome Back, {user['full_name']}!
-            Track your academic progress and identify areas for improvement.
-            """)
+            <p style="font-size:24px; font-weight:500; margin-bottom:25px; color:#6B7280;">
+                Track and review your academic progress across all subjects.
+            </p>
+            """, unsafe_allow_html=True)
 
             best_subject = max(all_scores, key=all_scores.get)
             weak_subject = min(all_scores, key=all_scores.get)
             avg_score = round(sum(all_scores.values()) / len(all_scores), 2)
 
+            total_entries = sum(
+                len(scores)
+                for scores in st.session_state["subject_scores"].values()
+            )
+
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.success(f"🏆 Strongest Subject: {best_subject}")
+                st.markdown(f"""
+                <div style="
+                    background:#ffffff;
+                    padding:24px;
+                    border-radius:18px;
+                    border:1px solid #E5E7EB;
+                    box-shadow:0 8px 20px rgba(0,0,0,.08);
+                    min-height:170px;
+                    text-align:center;
+                ">
+                    <div style="font-size:34px;">🏆</div>
+                    <p style="
+                        margin-top:10px;
+                        color:#6B7280;
+                        font-size:16px;
+                        font-weight:600;
+                    ">
+                        Best Subject
+                    </p>
+                    <h2 style="
+                        margin:8px 0;
+                        color:#16A34A;
+                        font-size:34px;
+                        font-weight:700;
+                    ">
+                        {best_subject}
+                    </h2>
+                    <p style="
+                        color:#9CA3AF;
+                        font-size:14px;
+                    ">
+                        Highest Average
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
             with col2:
-                st.warning(f"⚠️ Focus Area: {weak_subject}")
+                st.markdown(f"""
+                <div style="
+                    background:#ffffff;
+                    padding:24px;
+                    border-radius:18px;
+                    border:1px solid #E5E7EB;
+                    box-shadow:0 8px 20px rgba(0,0,0,.08);
+                    min-height:170px;
+                    text-align:center;
+                ">
+                    <div style="font-size:34px;">📈</div>
+                    <p style="
+                        margin-top:10px;
+                        color:#6B7280;
+                        font-size:16px;
+                        font-weight:600;
+                    ">
+                        Overall Average
+                    </p>
+                    <h2 style="
+                        margin:8px 0;
+                        color:#2563EB;
+                        font-size:34px;
+                        font-weight:700;
+                    ">
+                        {avg_score}%
+                    </h2>
+                    <p style="
+                        color:#9CA3AF;
+                        font-size:14px;
+                    ">
+                        Across All Tests
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
             with col3:
-                st.info(f"📈 Average Score: {avg_score}")
+                st.markdown(f"""
+                <div style="
+                    background:#ffffff;
+                    padding:24px;
+                    border-radius:18px;
+                    border:1px solid #E5E7EB;
+                    box-shadow:0 8px 20px rgba(0,0,0,.08);
+                    min-height:170px;
+                    text-align:center;
+                ">
+                    <div style="font-size:34px;">📝</div>
+                    <p style="
+                        margin-top:10px;
+                        color:#6B7280;
+                        font-size:16px;
+                        font-weight:600;
+                    ">
+                        Total Entries
+                    </p>
+                    <h2 style="
+                        margin:8px 0;
+                        color:#7C3AED;
+                        font-size:34px;
+                        font-weight:700;
+                    ">
+                        {total_entries}
+                    </h2>
+                    <p style="
+                        color:#9CA3AF;
+                        font-size:14px;
+                    ">
+                        Recorded Attempts
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
         else:
 
