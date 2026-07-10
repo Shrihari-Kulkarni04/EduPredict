@@ -623,6 +623,7 @@ def create_navigation():
         .st-key-profile_avatar_btn button,
         .st-key-mobile_profile_avatar_btn button {{
             width: 55px !important;
+            margin:0 !important;
             min-width: 55px !important;
             height: 55px !important;
             padding: 0 !important;
@@ -636,6 +637,7 @@ def create_navigation():
         .st-key-profile_avatar_btn button p,
         .st-key-mobile_profile_avatar_btn button p {{
             font-size: 0 !important;
+            margin:0 !important;
         }}
         @media (max-width: 768px) {{
             .st-key-edupredict_nav_desktop {{
@@ -692,23 +694,25 @@ def create_navigation():
             st.image("assets/edupredict_icon.png", width=120)
 
         with top_right:
+
             with st.popover("", use_container_width=False):
+
+                st.button("", key="profile_avatar_btn")
 
                 st.markdown("### 👤 Profile")
 
-                if st.button("✏️ Edit Profile", use_container_width=True):
-
+                if st.button("✏️ Edit Profile", key="edit_profile_btn"):
                     st.session_state["show_profile_editor"] = True
                     st.rerun()
 
                 st.divider()
 
-                if st.button("🚪 Logout", use_container_width=True):
-
+                if st.button("🚪 Logout", key="profile_logout"):
                     st.session_state.clear()
                     st.session_state["page"] = "login"
                     st.rerun()
-            
+
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
         # ---------- BOTTOM ROW ----------
         left_space, c1, c2, c3, c4, c5, right_space = st.columns(
@@ -770,10 +774,6 @@ def create_navigation():
                 st.session_state["show_profile_menu"] = False
                 st.session_state["show_mobile_nav"] = False
                 st.rerun()
-
-    # Render dropdown overlay card when menu is shown
-    # ---------- Profile Dropdown ----------
-    
 
 def display_dashboard(username):
     
