@@ -133,10 +133,14 @@ st.markdown(
             font-size: 15px !important;
             font-weight: 600 !important;
             transition: all 0.25s ease !important;
+            height:48px;
+            min-height:48px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
         }
 
         .stButton > button:hover {
+            height:48px;
+            min-height:48px;
             background: #000000 !important;
             transform: translateY(-2px);
             box-shadow: 0 8px 18px rgba(0,0,0,0.25) !important;
@@ -250,6 +254,8 @@ st.markdown(
                 flex: 1 1 100% !important;
             }
             .stButton > button {
+                height:48px;
+                min-height:48px;
                 width: 100% !important;
                 white-space: normal !important;
             }
@@ -281,6 +287,8 @@ st.markdown(
             }
             .st-key-profile_avatar_btn {
                 justify-content: flex-end !important;
+                align-items:center;
+                height:100%;
             }
         }
 
@@ -601,11 +609,15 @@ def create_navigation():
             align-items: center;
         }}
         .st-key-edupredict_nav_desktop .stButton > button {{
+            height:48px;
+            min-height:48px;
             white-space: nowrap !important;
         }}
         .st-key-profile_avatar_btn,
         .st-key-mobile_profile_avatar_btn {{
             display: flex;
+            align-items:center;
+            height:100%;
             justify-content: flex-end;
         }}
         .st-key-profile_avatar_btn button,
@@ -652,6 +664,8 @@ def create_navigation():
             .st-key-edupredict_mobile_menu .stButton > button {{
                 width: 100% !important;
                 text-align: left;
+                height:48px;
+                min-height:48px;
             }}
         }}
         @media (min-width: 769px) {{
@@ -670,28 +684,14 @@ def create_navigation():
         st.rerun()
 
     with st.container(key="edupredict_nav_desktop"):
-        nav_logo, nav_dashboard, nav_performance_col, nav_analytics_col, nav_study_col, nav_predictor_col, nav_profile_col = st.columns(
-            [1.6, 1.2, 1.6, 1.7, 1.8, 1.5, 0.8]
-        )
+        
+        # ---------- TOP ROW ----------
+        top_left, top_mid, top_right = st.columns([1, 6, 1])
 
-        with nav_logo:
+        with top_left:
             st.image("assets/edupredict_icon.png", width=120)
-        with nav_dashboard:
-            if st.button("Dashboard", key="nav_dashboard"):
-                go_to_page("dashboard")
-        with nav_performance_col:
-            if st.button("Performance", key="nav_performance"):
-                go_to_page("performance")
-        with nav_analytics_col:
-            if st.button("Analytics", key="nav_analytics"):
-                go_to_page("analytics")
-        with nav_study_col:
-            if st.button("Study Material", key="nav_study"):
-                go_to_page("study")
-        with nav_predictor_col:
-            if st.button("Predict Score", key="nav_predictor"):
-                go_to_page("predictor")
-        with nav_profile_col:
+
+        with top_right:
             if st.button("", key="profile_avatar_btn", help="Open profile menu"):
                 if st.session_state.get("show_profile_editor", False):
                     st.session_state["show_profile_editor"] = False
@@ -701,6 +701,31 @@ def create_navigation():
                         "show_profile_menu", False
                     )
                 st.rerun()
+
+        st.markdown("<br><br>", unsafe_allow_html=True)
+
+        # ---------- BOTTOM ROW ----------
+        c1, c2, c3, c4, c5 = st.columns(5)
+
+        with c1:
+            if st.button("Dashboard", key="nav_dashboard"):
+                go_to_page("dashboard")
+
+        with c2:
+            if st.button("Performance", key="nav_performance"):
+                go_to_page("performance")
+
+        with c3:
+            if st.button("Analytics", key="nav_analytics"):
+                go_to_page("analytics")
+
+        with c4:
+            if st.button("Study Material", key="nav_study"):
+                go_to_page("study")
+
+        with c5:
+            if st.button("Predict Score", key="nav_predictor"):
+                go_to_page("predictor")
 
     with st.container(key="edupredict_nav_mobile"):
         mobile_menu_col, mobile_profile_col = st.columns([6, 1])
@@ -1558,11 +1583,11 @@ def display_dashboard_page():
     # Create navigation
     create_navigation()
     
-    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
 
     if st.session_state.get("show_profile_editor", False):
         render_profile_editor(st.session_state.get("user"))
-        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top:12px;'></div>", unsafe_allow_html=True)
 
     # Load scores from MongoDB when initializing
     if "subject_scores" not in st.session_state:
@@ -1732,6 +1757,10 @@ def display_dashboard_page():
 
             🚀 Start by clicking **Add Score** below.
             """)
+            
+        if st.button("🚀 Go to Dashboard", use_container_width=True):
+            st.session_state["current_page"] = "dashboard"
+            st.rerun()
             
         if user:
             # Display the bar chart with recent entries if scores exist
@@ -2806,12 +2835,81 @@ else:
     st.markdown("---")
 
     st.markdown("""
-        <div style="text-align:center; padding:20px; color:#6b7280;">
-            <h4>EduPredict © 2026</h4>
-            <p style="margin-top:15px; font-size:14px;">
-                Developed by <b><I>Shrihari H Kulkarni</b></I><br>
-                AI-Powered Personalized Learning Platform<br>
-                Built with Python • Streamlit • MongoDB • TensorFlow
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+    <div style="
+    background:#ffffff;
+    border:1px solid #E5E7EB;
+    border-radius:18px;
+    padding:28px;
+    margin-top:40px;
+    text-align:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    ">
+
+    <h2 style="
+    margin-bottom:8px;
+    color:#111827;
+    ">
+    🎓 EduPredict v1.0
+    </h2>
+
+    <p style="
+    font-size:16px;
+    color:#6B7280;
+    margin-bottom:20px;
+    ">
+    AI-Powered Student Performance Prediction Platform
+    </p>
+
+    <hr style="
+    border:none;
+    border-top:1px solid #E5E7EB;
+    margin:20px 0;
+    ">
+
+    <p style="
+    font-size:16px;
+    margin-bottom:8px;
+    color:#111827;
+    ">
+    Developed by <b>Shrihari Kulkarni</b>
+    </p>
+
+    <p style="
+    color:#6B7280;
+    font-size:15px;
+    margin-bottom:18px;
+    ">
+    Built using Python • Streamlit • MongoDB • Scikit-Learn • Plotly
+    </p>
+
+    <div style="
+    display:inline-block;
+    background:#EEF4FF;
+    padding:10px 18px;
+    border-radius:30px;
+    font-size:14px;
+    font-weight:600;
+    color:#2563EB;
+    margin-bottom:20px;
+    ">
+    🤖 AI predictions are generated for educational guidance only.
+    </div>
+
+    <p style="
+    font-size:14px;
+    color:#9CA3AF;
+    margin-top:20px;
+    ">
+    Version 1.0 • July 2026
+    </p>
+
+    <p style="
+    font-size:13px;
+    color:#9CA3AF;
+    margin-top:8px;
+    ">
+    © 2026 EduPredict. All Rights Reserved.
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
