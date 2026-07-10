@@ -695,22 +695,15 @@ def create_navigation():
 
         with top_right:
 
-            with st.popover("", use_container_width=False):
-
-                st.button("", key="profile_avatar_btn")
-
-                st.markdown("### 👤 Profile")
-
-                if st.button("✏️ Edit Profile", key="edit_profile_btn"):
-                    st.session_state["show_profile_editor"] = True
-                    st.rerun()
-
-                st.divider()
-
-                if st.button("🚪 Logout", key="profile_logout"):
-                    st.session_state.clear()
-                    st.session_state["page"] = "login"
-                    st.rerun()
+            if st.button("", key="profile_avatar_btn", help="Open profile menu"):
+                if st.session_state.get("show_profile_editor", False):
+                    st.session_state["show_profile_editor"] = False
+                    st.session_state["show_profile_menu"] = False
+                else:
+                    st.session_state["show_profile_menu"] = not st.session_state.get(
+                        "show_profile_menu", False
+                    )
+                st.rerun()
 
         st.markdown("<br><br>", unsafe_allow_html=True)
 
