@@ -692,17 +692,23 @@ def create_navigation():
             st.image("assets/edupredict_icon.png", width=120)
 
         with top_right:
-            if st.button("", key="profile_avatar_btn", help="Open profile menu"):
-                if st.session_state.get("show_profile_editor", False):
-                    st.session_state["show_profile_editor"] = False
-                    st.session_state["show_profile_menu"] = False
-                else:
-                    st.session_state["show_profile_menu"] = not st.session_state.get(
-                        "show_profile_menu", False
-                    )
-                st.rerun()
+            with st.popover("", use_container_width=False):
 
-        st.markdown("<br><br>", unsafe_allow_html=True)
+                st.markdown("### 👤 Profile")
+
+                if st.button("✏️ Edit Profile", use_container_width=True):
+
+                    st.session_state["show_profile_editor"] = True
+                    st.rerun()
+
+                st.divider()
+
+                if st.button("🚪 Logout", use_container_width=True):
+
+                    st.session_state.clear()
+                    st.session_state["page"] = "login"
+                    st.rerun()
+            
 
         # ---------- BOTTOM ROW ----------
         left_space, c1, c2, c3, c4, c5, right_space = st.columns(
@@ -766,17 +772,8 @@ def create_navigation():
                 st.rerun()
 
     # Render dropdown overlay card when menu is shown
-    if st.session_state.get("show_profile_menu"):
-
-        if st.button("✏️ Edit Profile", key="edit_profile_btn"):
-            st.session_state["show_profile_editor"] = True
-            st.session_state["show_profile_menu"] = False
-            st.rerun()
-
-        if st.button("Logout", key="profile_logout"):
-            st.session_state.clear()
-            st.session_state["page"] = "login"
-            st.rerun()
+    # ---------- Profile Dropdown ----------
+    
 
 def display_dashboard(username):
     
@@ -2873,7 +2870,7 @@ else:
     margin-bottom:8px;
     color:#111827;
     ">
-    Developed by <b>Shrihari Kulkarni</b>
+    Developed by <b>Shrihari H Kulkarni</b>
     </p>
 
     <p style="
