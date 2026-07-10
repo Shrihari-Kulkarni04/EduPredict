@@ -1932,20 +1932,6 @@ def display_dashboard_page():
                 """, unsafe_allow_html=True)
     elif st.session_state["current_page"] == "predictor":
 
-        highest_subject = max(
-            st.session_state["predictions"],
-            key=lambda x: st.session_state["predictions"][x]
-            if isinstance(st.session_state["predictions"][x], (int, float))
-            else -1
-        )
-
-        lowest_subject = min(
-            st.session_state["predictions"],
-            key=lambda x: st.session_state["predictions"][x]
-            if isinstance(st.session_state["predictions"][x], (int, float))
-            else 999
-        )
-
         st.title("🤖 AI Score Prediction")
 
         st.markdown(
@@ -1972,8 +1958,27 @@ def display_dashboard_page():
 
         # No scores available
         if not subject_scores or not any(numeric_subject_scores.values()):
-            st.warning("⚠️ AI Prediction is not available yet.")
-            st.info("Please add your scores from the Performance History page.")
+
+            st.markdown("""
+            <div style="
+                background:#FFF7ED;
+                border:1px solid #FDBA74;
+                border-radius:14px;
+                padding:25px;
+                text-align:center;
+                margin-top:20px;
+            ">
+                <h3>🔒 AI Prediction Locked</h3>
+                <p>Please add your first score entries from the Performance History page.</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if st.button("➕ Add Score", use_container_width=True):
+                st.session_state["current_page"] = "performance"
+                st.session_state["show_add_form"] = True
+                st.session_state["show_change_form"] = False
+                st.rerun()
+
             st.stop()
 
         # Minimum entries among all subjects
@@ -2141,6 +2146,20 @@ def display_dashboard_page():
             avg_prediction = round(
                 sum(valid_predictions) / len(valid_predictions),
                 2,
+            )
+
+            highest_subject = max(
+                st.session_state["predictions"],
+                key=lambda x: st.session_state["predictions"][x]
+                if isinstance(st.session_state["predictions"][x], (int, float))
+                else -1
+            )
+
+            lowest_subject = min(
+                st.session_state["predictions"],
+                key=lambda x: st.session_state["predictions"][x]
+                if isinstance(st.session_state["predictions"][x], (int, float))
+                else 999
             )
 
         st.markdown(f"""
