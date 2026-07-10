@@ -683,8 +683,12 @@ def create_marks_bar_graph(subject_scores):
     
     # Process each subject
     for subject, scores in subject_scores.items():
+        scores = get_numeric_scores(scores)
+        if not scores:
+            continue
+
         # Get only the last 3 entries
-        recent_scores = scores[-3:] if len(scores) >= 3 else scores
+        recent_scores = scores[-3:].copy() if len(scores) >= 3 else scores.copy()
         
         # Add bars for each score entry
         for i, score in enumerate(recent_scores):
@@ -737,6 +741,12 @@ def create_marks_bar_graph(subject_scores):
     
     return fig
 
+def get_numeric_scores(scores):
+    return [
+        score for score in scores
+        if isinstance(score, (int, float))
+    ]
+
 from sklearn.linear_model import LinearRegression
 
 def train_and_predict(subject_scores):
@@ -744,8 +754,12 @@ def train_and_predict(subject_scores):
 
     for subject, scores in subject_scores.items():
 
-        if len(scores) < 2:
-            predictions[subject] = "Not enough data to make a prediction."
+        # Keep only numeric scores
+        scores = get_numeric_scores(scores)
+
+        # Require at least 3 entries
+        if len(scores) < 3:
+            predictions[subject] = "Minimum 3 score entries are required."
             continue
 
         mean_score = sum(scores) / len(scores)
@@ -764,7 +778,6 @@ def train_and_predict(subject_scores):
         predictions[subject] = round(final_prediction, 2)
 
     return predictions
-
 # Add function to save scores to MongoDB
 def save_scores_to_mongodb(username, subject_scores):
     users_collection.update_one(
@@ -813,6 +826,7 @@ def compute_analytics(subject_scores):
     improvements = []
 
     for scores in subject_scores.values():
+        scores = get_numeric_scores(scores)
         if len(scores) >= 2:
             previous = scores[-2]
             current = scores[-1]
@@ -826,6 +840,7 @@ def compute_analytics(subject_scores):
     subject_averages = {}
     all_scores = []
     for subject, scores in subject_scores.items():
+        scores = get_numeric_scores(scores)
         if scores and len(scores) > 0:
             avg = sum(scores) / len(scores)
             subject_averages[subject] = round(avg, 2)
@@ -1270,13 +1285,17 @@ def render_analytics_page(subject_scores):
             import plotly.graph_objects as go
 
             averages = []
+            numeric_subject_scores = {
+                subject: get_numeric_scores(scores)
+                for subject, scores in subject_scores.items()
+            }
 
-            max_entries = max((len(scores) for scores in subject_scores.values()), default=0)
+            max_entries = max((len(scores) for scores in numeric_subject_scores.values()), default=0)
 
             for i in range(max_entries):
                 current = []
 
-                for scores in subject_scores.values():
+                for scores in numeric_subject_scores.values():
                     if i < len(scores):
                         current.append(scores[i])
 
@@ -1345,7 +1364,10 @@ def display_dashboard_page():
 
     # Load scores from MongoDB when initializing
     if "subject_scores" not in st.session_state:
-        st.session_state["subject_scores"] = load_scores_from_mongodb(st.session_state.get("username", ""))
+        st.session_state["subject_scores"] = {
+            subject: get_numeric_scores(scores)
+            for subject, scores in load_scores_from_mongodb(st.session_state.get("username", "")).items()
+        }
 
     # Display current page content
     if st.session_state["current_page"] == "dashboard":
@@ -1359,9 +1381,9 @@ def display_dashboard_page():
         subjects = get_subjects_for_grade(class_grade) if user else []
        
         all_scores = {
-            subject: sum(scores) / len(scores)
-            for subject, scores in st.session_state.get("subject_scores", {}).items()
-            if scores
+            subject: sum(get_numeric_scores(scores)) / len(get_numeric_scores(scores))
+            for subject, scores in st.session_state["subject_scores"].items()
+            if get_numeric_scores(scores)
         }
 
         if all_scores:
@@ -1377,7 +1399,7 @@ def display_dashboard_page():
             avg_score = round(sum(all_scores.values()) / len(all_scores), 2)
 
             total_entries = sum(
-                len(scores)
+                len(get_numeric_scores(scores))
                 for scores in st.session_state["subject_scores"].values()
             )
 
@@ -1525,10 +1547,10 @@ def display_dashboard_page():
 
                 for subject, scores in st.session_state["subject_scores"].items():
 
-                    recent_scores = scores[-3:] if len(scores) >= 3 else scores
+                    recent_scores = get_numeric_scores(scores)[-3:].copy()
 
                     while len(recent_scores) < 3:
-                        recent_scores.insert(0, "-")
+                        recent_scores.append("-")
 
                     table_data.append({
                         "Subject": subject,
@@ -1663,7 +1685,7 @@ def display_dashboard_page():
 
         # Change Subject Marks Button and Form
         with col2:
-            if st.session_state["subject_scores"]:
+            if any(get_numeric_scores(scores) for scores in st.session_state["subject_scores"].values()):
                 if st.button("Change Subject Marks", key="change_marks_btn"):
                     st.session_state["show_change_form"] = True
                     st.session_state["show_add_form"] = False
@@ -1684,6 +1706,10 @@ def display_dashboard_page():
                             st.session_state["subject_scores"][subject].append(score)
                         else:
                             st.session_state["subject_scores"][subject] = [score]
+                    st.session_state["subject_scores"] = {
+                        subject: get_numeric_scores(scores)
+                        for subject, scores in st.session_state["subject_scores"].items()
+                    }
                     # Save scores to MongoDB
                     save_scores_to_mongodb(st.session_state.get("username", ""), st.session_state["subject_scores"])
                     st.success("Scores added successfully!")
@@ -1695,15 +1721,25 @@ def display_dashboard_page():
             with st.form("change_marks_form"):
                 st.subheader("Change Subject Marks")
                 subject_to_change = st.selectbox("Select Subject", subjects)
-                if subject_to_change in st.session_state["subject_scores"] and len(st.session_state["subject_scores"][subject_to_change]) > 0:
+                current_subject_scores = st.session_state["subject_scores"].get(subject_to_change, [])
+                numeric_entry_indexes = [
+                    index for index, score in enumerate(current_subject_scores)
+                    if isinstance(score, (int, float))
+                ]
+                if numeric_entry_indexes:
                     entry_index = st.selectbox("Select Entry to Change", 
-                                            range(1, len(st.session_state["subject_scores"][subject_to_change]) + 1),
+                                            range(1, len(numeric_entry_indexes) + 1),
                                             format_func=lambda x: f"Entry {x}")
+                    actual_entry_index = numeric_entry_indexes[entry_index - 1]
                     new_score = st.number_input("New Score", min_value=0, max_value=100, 
-                                            value=st.session_state["subject_scores"][subject_to_change][entry_index-1])
+                                            value=st.session_state["subject_scores"][subject_to_change][actual_entry_index])
                     submitted = st.form_submit_button("Update Score")
                     if submitted:
-                        st.session_state["subject_scores"][subject_to_change][entry_index-1] = new_score
+                        st.session_state["subject_scores"][subject_to_change][actual_entry_index] = new_score
+                        st.session_state["subject_scores"] = {
+                            subject: get_numeric_scores(scores)
+                            for subject, scores in st.session_state["subject_scores"].items()
+                        }
                         # Save updated scores to MongoDB
                         save_scores_to_mongodb(st.session_state.get("username", ""), st.session_state["subject_scores"])
                         st.success(f"Score updated successfully for {subject_to_change}!")
@@ -1895,91 +1931,295 @@ def display_dashboard_page():
                     </div>
                 """, unsafe_allow_html=True)
     elif st.session_state["current_page"] == "predictor":
-        st.title("Predict Score")
-        
-        # Initialize prediction state if not exists
+
+        highest_subject = max(
+            st.session_state["predictions"],
+            key=lambda x: st.session_state["predictions"][x]
+            if isinstance(st.session_state["predictions"][x], (int, float))
+            else -1
+        )
+
+        lowest_subject = min(
+            st.session_state["predictions"],
+            key=lambda x: st.session_state["predictions"][x]
+            if isinstance(st.session_state["predictions"][x], (int, float))
+            else 999
+        )
+
+        st.title("🤖 AI Score Prediction")
+
+        st.markdown(
+            """
+            <p style="font-size:28px; color:#6B7280; margin-top:-10px;">
+                Predict your future academic performance based on your previous score history.
+            </p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Initialize prediction state
         if "predictions" not in st.session_state:
             st.session_state["predictions"] = None
+
         if "last_scores_state" not in st.session_state:
             st.session_state["last_scores_state"] = None
-        else:
-            st.subheader("Student Performance Dashboard")
 
-        if "subject_scores" not in st.session_state:
-            st.info("Please enter your scores for each subject.")
-            # Get user's class grade
-            user = st.session_state.get("user")
-            if user:
-                class_grade = user.get("class_grade", "")
-                subjects = get_subjects_for_grade(class_grade)
-                scores = {}
-                with st.form("score_form"):
-                    for subject in subjects:
-                        scores[subject] = st.number_input(f"{subject} Score", min_value=0, max_value=100, value=0)
-                    submitted = st.form_submit_button("Submit Scores")
-                    if submitted:
-                        st.session_state["subject_scores"] = {subject: [score] for subject, score in scores.items()}
-                        # Reset predictions when new scores are submitted
-                        st.session_state["predictions"] = None
-                        st.session_state["last_scores_state"] = None
-                        st.success("Scores submitted successfully!")
-                        st.rerun()
-        else:
-            # Check if scores have changed
-            current_scores_state = str(st.session_state["subject_scores"])
-            scores_changed = current_scores_state != st.session_state["last_scores_state"]
+        subject_scores = st.session_state.get("subject_scores", {})
+        numeric_subject_scores = {
+            subject: get_numeric_scores(scores)
+            for subject, scores in subject_scores.items()
+        }
 
-            # Only recalculate predictions if scores have changed or no predictions exist
-            if scores_changed or st.session_state["predictions"] is None:
-                with st.spinner('Predicting scores... Please wait.'):
-                    st.session_state["predictions"] = train_and_predict(st.session_state["subject_scores"])
-                    st.session_state["last_scores_state"] = current_scores_state
-            
-            # Display predictions
-            st.subheader("Predicted Next Scores")
-            
-            # Create two columns for better visualization
+        # No scores available
+        if not subject_scores or not any(numeric_subject_scores.values()):
+            st.warning("⚠️ AI Prediction is not available yet.")
+            st.info("Please add your scores from the Performance History page.")
+            st.stop()
+
+        # Minimum entries among all subjects
+        number_of_entries = min(len(scores) for scores in numeric_subject_scores.values())
+
+        # Require minimum 3 entries
+        if number_of_entries < 3:
+
+            remaining = 3 - number_of_entries
+
+            st.markdown(f"""
+            <div style="
+            background:#FFF7ED;
+            border:1px solid #FDBA74;
+            border-radius:12px;
+            padding:25px;
+            margin-top:20px;
+            text-align:center;
+            ">
+
+            <h3 style="margin-bottom:10px;">
+            🔒 AI Prediction Locked
+            </h3>
+
+            <p style="font-size:17px;">
+            You need <b>{remaining}</b> more
+            {'entry' if remaining == 1 else 'entries'}
+            for each subject before AI Prediction becomes available.
+            </p>
+
+            <p style="color:#6B7280;">
+            Current Progress: <b>{number_of_entries}/3 Entries</b>
+            </p>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.progress(number_of_entries / 3)
+
+            if st.button("➕ Go to Performance History", use_container_width=True):
+                st.session_state["current_page"] = "performance"
+                st.rerun()
+
+            st.stop()
+            if st.button("Add Score", key="add_score_btn"):
+                st.session_state["show_add_form"] = True
+                st.session_state["show_change_form"] = False
+                st.session_state["current_page"] = "performance"
+                st.rerun()
+        
+            st.progress(number_of_entries / 3)
+
+            st.markdown(f"**Progress : {number_of_entries}/3 Entries**")
+
+            st.stop()
+
+        current_scores_state = str(numeric_subject_scores)
+        scores_changed = (
+            current_scores_state != st.session_state["last_scores_state"]
+        )
+
+        if scores_changed or st.session_state["predictions"] is None:
+
+            with st.spinner("Predicting scores... Please wait..."):
+
+                st.session_state["predictions"] = train_and_predict(numeric_subject_scores)
+                st.session_state["last_scores_state"] = current_scores_state
+
+        # ---------------- Display ----------------
+
+        st.markdown("""
+        <div style="
+        background:linear-gradient(135deg,#00000f,#1e3c72);
+        padding:22px;
+        border-radius:14px;
+        color:white;
+        text-align:center;
+        margin-bottom:20px;
+        box-shadow:0 8px 20px rgba(0,0,0,.15);
+        ">
+        <h2 style="margin:0;">📊 AI Prediction Results</h2>
+        <p style="margin-top:8px;font-size:16px;">
+        Your predicted performance based on previous score history
+        </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("## 📚 Subject-wise Predictions")
+
+        predictions = st.session_state["predictions"]
+        prediction_items = list(predictions.items())
+
+        for i in range(0, len(prediction_items), 2):
+
             col1, col2 = st.columns(2)
-            
-            # Display predictions in a table format
-            with col1:
-                st.markdown("### Subject-wise Predictions")
-                for subject, prediction in st.session_state["predictions"].items():
+
+            for col, (subject, prediction) in zip(
+                [col1, col2],
+                prediction_items[i:i+2]
+            ):
+
+                with col:
+
                     if isinstance(prediction, str):
+
                         st.warning(f"{subject}: {prediction}")
+
                     else:
-                        st.info(f"{subject}: {prediction}")
 
-                        if prediction < 50:
-                            st.error("Recommendation: Focus on fundamentals, revise NCERT chapters, and practice daily.")
-                        elif prediction < 70:
-                            st.warning("Recommendation: Increase practice and solve previous year questions.")
+                        if prediction >= 70:
+                            bg = "#ECFDF5"
+                            border = "#22C55E"
+                            status = "🟢 Excellent"
+                            recommendation = "Maintain consistency and attempt advanced problems."
+
+                        elif prediction >= 50:
+                            bg = "#FEFCE8"
+                            border = "#EAB308"
+                            status = "🟡 Average"
+                            recommendation = "Increase practice and solve previous year questions."
+
                         else:
-                            st.success("Recommendation: Maintain consistency and attempt advanced problems.")
-            
-            # Display average prediction
-            with col2:
-                valid_predictions = [pred for pred in st.session_state["predictions"].values() if isinstance(pred, (int, float))]
-                if valid_predictions:
-                    avg_prediction = round(sum(valid_predictions) / len(valid_predictions), 2)
-                    st.markdown("### Overall Prediction")
-                    st.metric("Average Predicted Score", f"{avg_prediction}")
-                    highest_subject = max(
-                        st.session_state["predictions"],
-                        key=lambda x: st.session_state["predictions"][x]
-                        if isinstance(st.session_state["predictions"][x], (int, float))
-                        else -1
-                    )
+                            bg = "#FEF2F2"
+                            border = "#EF4444"
+                            status = "🔴 Needs Improvement"
+                            recommendation = "Focus on fundamentals, revise NCERT chapters, and practice daily."
 
-                    st.success(f"Strongest Subject: {highest_subject}")
-                    lowest_subject = min(
-                        st.session_state["predictions"],
-                        key=lambda x: st.session_state["predictions"][x]
-                        if isinstance(st.session_state["predictions"][x], (int, float))
-                        else 999
-                    )
+                        st.markdown(f"""
+                        <div style="
+                        background:{bg};
+                        border-left:6px solid {border};
+                        padding:18px;
+                        border-radius:12px;
+                        margin-bottom:18px;
+                        box-shadow:0 4px 12px rgba(0,0,0,.08);
+                        ">
 
-                    st.error(f"Weakest Subject: {lowest_subject}")
+                        <h4 style="margin-bottom:8px;">📘 {subject}</h4>
+
+                        <h2 style="margin:0;color:#1F2937;">
+                        {prediction}/100
+                        </h2>
+
+                        <p style="font-weight:bold;">
+                        {status}
+                        </p>
+
+                        <hr>
+
+                        <b>Recommendation</b>
+
+                        <p>{recommendation}</p>
+
+                        </div>
+                        """, unsafe_allow_html=True)
+
+        valid_predictions = [
+    pred
+    for pred in st.session_state["predictions"].values()
+    if isinstance(pred, (int, float))
+]
+
+    if valid_predictions:
+
+        avg_prediction = round(
+            sum(valid_predictions) / len(valid_predictions),
+            2,
+        )
+
+        st.markdown(f"""
+    <div style="display:flex; gap:20px; margin-top:15px;">
+
+    <div style="
+        flex:1;
+        background:#EFF6FF;
+        border:1px solid #BFDBFE;
+        border-radius:14px;
+        padding:20px;
+        text-align:center;
+        box-shadow:0 4px 12px rgba(0,0,0,.08);
+    ">
+        <div style="font-size:15px;color:#6B7280;">🎯 Average Prediction</div>
+        <div style="font-size:34px;font-weight:bold;color:#2563EB;margin-top:10px;">
+            {avg_prediction}
+        </div>
+    </div>
+
+    <div style="
+        flex:1;
+        background:#ECFDF5;
+        border:1px solid #A7F3D0;
+        border-radius:14px;
+        padding:20px;
+        text-align:center;
+        box-shadow:0 4px 12px rgba(0,0,0,.08);
+    ">
+        <div style="font-size:15px;color:#6B7280;">🏆 Strongest Subject</div>
+        <div style="font-size:30px;font-weight:bold;color:#16A34A;margin-top:10px;">
+            {highest_subject}
+        </div>
+    </div>
+
+    <div style="
+        flex:1;
+        background:#FEF2F2;
+        border:1px solid #FECACA;
+        border-radius:14px;
+        padding:20px;
+        text-align:center;
+        box-shadow:0 4px 12px rgba(0,0,0,.08);
+    ">
+        <div style="font-size:15px;color:#6B7280;">📚 Focus Area</div>
+        <div style="font-size:30px;font-weight:bold;color:#DC2626;margin-top:10px;">
+            {lowest_subject}
+        </div>
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        recommendations = []
+
+        for subject, prediction in st.session_state["predictions"].items():
+
+            if isinstance(prediction, str):
+                continue
+
+            if prediction < 50:
+
+                recommendations.append(
+                    f"🔴 Focus more on **{subject}** fundamentals."
+                )
+
+            elif prediction < 70:
+
+                recommendations.append(
+                    f"🟡 Practice additional questions in **{subject}**."
+                )
+
+        if not recommendations:
+
+            recommendations.append(
+                "🟢 Excellent performance. Maintain your consistency."
+            )
+
+        for recommendation in recommendations:
+            st.info(recommendation)
     elif st.session_state["current_page"] == "analytics":
         st.markdown("""
         <div style="
