@@ -639,6 +639,54 @@ def create_navigation():
             font-size: 0 !important;
             margin:0 !important;
         }}
+        .st-key-profile_menu_anchor,
+        .st-key-mobile_profile_menu_anchor {{
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }}
+        .st-key-profile_dropdown_menu,
+        .st-key-mobile_profile_dropdown_menu {{
+            position: absolute;
+            top: 62px;
+            right: 0;
+            width: 190px;
+            padding: 8px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+            z-index: 10000;
+        }}
+        .st-key-profile_dropdown_menu .stButton > button,
+        .st-key-mobile_profile_dropdown_menu .stButton > button {{
+            width: 100% !important;
+            height: 42px !important;
+            min-height: 42px !important;
+            padding: 8px 10px !important;
+            text-align: left !important;
+            background: #ffffff !important;
+            color: #111827 !important;
+            box-shadow: none !important;
+            border-radius: 8px !important;
+        }}
+        .st-key-profile_dropdown_menu .stButton > button:hover,
+        .st-key-mobile_profile_dropdown_menu .stButton > button:hover {{
+            background: #f3f4f6 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }}
+        .st-key-profile_menu_close_control {{
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }}
         @media (max-width: 768px) {{
             .st-key-edupredict_nav_desktop {{
                 display: none !important;
@@ -695,15 +743,28 @@ def create_navigation():
 
         with top_right:
 
-            if st.button("", key="profile_avatar_btn", help="Open profile menu"):
-                if st.session_state.get("show_profile_editor", False):
-                    st.session_state["show_profile_editor"] = False
-                    st.session_state["show_profile_menu"] = False
-                else:
-                    st.session_state["show_profile_menu"] = not st.session_state.get(
-                        "show_profile_menu", False
-                    )
-                st.rerun()
+            with st.container(key="profile_menu_anchor"):
+                if st.button("", key="profile_avatar_btn", help="Open profile menu"):
+                    if st.session_state.get("show_profile_editor", False):
+                        st.session_state["show_profile_editor"] = False
+                        st.session_state["show_profile_menu"] = False
+                    else:
+                        st.session_state["show_profile_menu"] = not st.session_state.get(
+                            "show_profile_menu", False
+                        )
+                    st.rerun()
+
+                if st.session_state.get("show_profile_menu"):
+                    with st.container(key="profile_dropdown_menu"):
+                        if st.button("✏️ Edit Profile", key="profile_dropdown_edit"):
+                            st.session_state["show_profile_editor"] = True
+                            st.session_state["show_profile_menu"] = False
+                            st.rerun()
+
+                        if st.button("🚪 Logout", key="profile_dropdown_logout"):
+                            st.session_state.clear()
+                            st.session_state["page"] = "login"
+                            st.rerun()
 
         st.markdown("<br><br>", unsafe_allow_html=True)
 
@@ -740,15 +801,28 @@ def create_navigation():
                 st.session_state["show_mobile_nav"] = not st.session_state.get("show_mobile_nav", False)
                 st.rerun()
         with mobile_profile_col:
-            if st.button("", key="mobile_profile_avatar_btn", help="Open profile menu"):
-                if st.session_state.get("show_profile_editor", False):
-                    st.session_state["show_profile_editor"] = False
-                    st.session_state["show_profile_menu"] = False
-                else:
-                    st.session_state["show_profile_menu"] = not st.session_state.get(
-                        "show_profile_menu", False
-                    )
-                st.rerun()
+            with st.container(key="mobile_profile_menu_anchor"):
+                if st.button("", key="mobile_profile_avatar_btn", help="Open profile menu"):
+                    if st.session_state.get("show_profile_editor", False):
+                        st.session_state["show_profile_editor"] = False
+                        st.session_state["show_profile_menu"] = False
+                    else:
+                        st.session_state["show_profile_menu"] = not st.session_state.get(
+                            "show_profile_menu", False
+                        )
+                    st.rerun()
+
+                if st.session_state.get("show_profile_menu"):
+                    with st.container(key="mobile_profile_dropdown_menu"):
+                        if st.button("✏️ Edit Profile", key="mobile_profile_dropdown_edit"):
+                            st.session_state["show_profile_editor"] = True
+                            st.session_state["show_profile_menu"] = False
+                            st.rerun()
+
+                        if st.button("🚪 Logout", key="mobile_profile_dropdown_logout"):
+                            st.session_state.clear()
+                            st.session_state["page"] = "login"
+                            st.rerun()
 
     if st.session_state.get("show_mobile_nav", False):
         with st.container(key="edupredict_mobile_menu"):
@@ -767,6 +841,42 @@ def create_navigation():
                 st.session_state["show_profile_menu"] = False
                 st.session_state["show_mobile_nav"] = False
                 st.rerun()
+
+    if st.session_state.get("show_profile_menu"):
+        with st.container(key="profile_menu_close_control"):
+            if st.button("Close Profile Menu", key="profile_dropdown_close"):
+                st.session_state["show_profile_menu"] = False
+                st.rerun()
+
+        components.html(
+            """
+            <script>
+            const parentDoc = window.parent.document;
+            if (!window.parent.__edupredictProfileOutsideClick) {
+                window.parent.__edupredictProfileOutsideClick = true;
+                parentDoc.addEventListener("click", function(event) {
+                    const dropdown = parentDoc.querySelector(
+                        ".st-key-profile_dropdown_menu, .st-key-mobile_profile_dropdown_menu"
+                    );
+                    const closeButton = parentDoc.querySelector(
+                        ".st-key-profile_menu_close_control button"
+                    );
+                    if (!dropdown || !closeButton) {
+                        return;
+                    }
+                    const clickedInsideProfileMenu = event.target.closest(
+                        ".st-key-profile_avatar_btn, .st-key-mobile_profile_avatar_btn, .st-key-profile_dropdown_menu, .st-key-mobile_profile_dropdown_menu"
+                    );
+                    if (!clickedInsideProfileMenu) {
+                        closeButton.click();
+                    }
+                }, true);
+            }
+            </script>
+            """,
+            height=0,
+            width=0
+        )
 
 def display_dashboard(username):
     
