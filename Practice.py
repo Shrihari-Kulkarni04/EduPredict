@@ -574,95 +574,181 @@ def render_profile_editor(user):
 def create_navigation():
 
     user = st.session_state.get("user")
+    profile_src = get_profile_picture_src(user)
+    css_profile_src = profile_src.replace("\\", "\\\\").replace('"', '\\"')
 
-    col_title, col_profile = st.columns([9,1])
+    # Ensure session state flags exist
+    if "show_profile_menu" not in st.session_state:
+        st.session_state["show_profile_menu"] = False
+    if "show_mobile_nav" not in st.session_state:
+        st.session_state["show_mobile_nav"] = False
 
-    with col_title:
-            st.image("assets/edupredict_icon.png", width=120)
-
-    with col_profile:
-
-        st.markdown("", unsafe_allow_html=True)
-        profile_src = get_profile_picture_src(user)
-        css_profile_src = profile_src.replace("\\", "\\\\").replace('"', '\\"')
-
-        # Ensure session state flags exist
-        if "show_profile_menu" not in st.session_state:
-            st.session_state["show_profile_menu"] = False
-
-        # image button for profile menu
-        st.markdown(
-            f"""
-            <style>
-            .st-key-profile_avatar_btn {{
-                display: flex;
-                justify-content: flex-end;
+    st.markdown(
+        f"""
+        <style>
+        .st-key-edupredict_nav_mobile,
+        .st-key-edupredict_mobile_menu {{
+            display: none;
+        }}
+        .st-key-edupredict_nav_desktop,
+        .st-key-edupredict_nav_mobile,
+        .st-key-edupredict_mobile_menu {{
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }}
+        .st-key-edupredict_nav_desktop [data-testid="stHorizontalBlock"] {{
+            align-items: center;
+        }}
+        .st-key-edupredict_nav_desktop .stButton > button {{
+            white-space: nowrap !important;
+        }}
+        .st-key-profile_avatar_btn,
+        .st-key-mobile_profile_avatar_btn {{
+            display: flex;
+            justify-content: flex-end;
+        }}
+        .st-key-profile_avatar_btn button,
+        .st-key-mobile_profile_avatar_btn button {{
+            width: 55px !important;
+            min-width: 55px !important;
+            height: 55px !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            border: 2px solid #ddd !important;
+            background-image: url("{css_profile_src}") !important;
+            background-position: center !important;
+            background-size: cover !important;
+            cursor: pointer !important;
+        }}
+        .st-key-profile_avatar_btn button p,
+        .st-key-mobile_profile_avatar_btn button p {{
+            font-size: 0 !important;
+        }}
+        @media (max-width: 768px) {{
+            .st-key-edupredict_nav_desktop {{
+                display: none !important;
             }}
-            .st-key-profile_avatar_btn button {{
-                width: 55px !important;
-                min-width: 55px !important;
-                height: 55px !important;
-                padding: 0 !important;
-                border-radius: 50% !important;
-                border: 2px solid #ddd !important;
-                background-image: url("{css_profile_src}") !important;
-                background-position: center !important;
-                background-size: cover !important;
-                cursor: pointer !important;
+            .st-key-edupredict_nav_mobile {{
+                display: block !important;
             }}
-            .st-key-profile_avatar_btn button p {{
-                font-size: 0 !important;
+            .st-key-edupredict_nav_mobile [data-testid="stHorizontalBlock"] {{
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 12px !important;
             }}
-            </style>
-            """,
-            unsafe_allow_html=True
+            .st-key-edupredict_nav_mobile [data-testid="column"] {{
+                width: auto !important;
+                min-width: 0 !important;
+                flex: 0 0 auto !important;
+            }}
+            .st-key-edupredict_nav_mobile [data-testid="column"]:first-child {{
+                flex: 1 1 auto !important;
+            }}
+            .st-key-edupredict_mobile_menu {{
+                display: block !important;
+            }}
+            .st-key-edupredict_mobile_menu .stButton > button {{
+                width: 100% !important;
+                text-align: left;
+            }}
+        }}
+        @media (min-width: 769px) {{
+            .st-key-edupredict_nav_desktop {{
+                display: block !important;
+            }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    def go_to_page(page_name):
+        st.session_state["current_page"] = page_name
+        st.session_state["show_mobile_nav"] = False
+        st.rerun()
+
+    with st.container(key="edupredict_nav_desktop"):
+        nav_logo, nav_dashboard, nav_performance_col, nav_analytics_col, nav_study_col, nav_predictor_col, nav_profile_col = st.columns(
+            [1.6, 1.2, 1.6, 1.7, 1.8, 1.5, 0.8]
         )
 
-        if st.button("", key="profile_avatar_btn", help="Open profile menu"):
+        with nav_logo:
+            st.image("assets/edupredict_icon.png", width=120)
+        with nav_dashboard:
+            if st.button("Dashboard", key="nav_dashboard"):
+                go_to_page("dashboard")
+        with nav_performance_col:
+            if st.button("Performance", key="nav_performance"):
+                go_to_page("performance")
+        with nav_analytics_col:
+            if st.button("Analytics", key="nav_analytics"):
+                go_to_page("analytics")
+        with nav_study_col:
+            if st.button("Study Material", key="nav_study"):
+                go_to_page("study")
+        with nav_predictor_col:
+            if st.button("Predict Score", key="nav_predictor"):
+                go_to_page("predictor")
+        with nav_profile_col:
+            if st.button("", key="profile_avatar_btn", help="Open profile menu"):
+                if st.session_state.get("show_profile_editor", False):
+                    st.session_state["show_profile_editor"] = False
+                    st.session_state["show_profile_menu"] = False
+                else:
+                    st.session_state["show_profile_menu"] = not st.session_state.get(
+                        "show_profile_menu", False
+                    )
+                st.rerun()
 
-            if st.session_state.get("show_profile_editor", False):
-                st.session_state["show_profile_editor"] = False
-                st.session_state["show_profile_menu"] = False
+    with st.container(key="edupredict_nav_mobile"):
+        mobile_menu_col, mobile_profile_col = st.columns([6, 1])
 
-            else:
-                st.session_state["show_profile_menu"] = not st.session_state.get(
-                    "show_profile_menu", False
-                )
+        with mobile_menu_col:
+            if st.button("☰ EduPredict", key="mobile_nav_toggle"):
+                st.session_state["show_mobile_nav"] = not st.session_state.get("show_mobile_nav", False)
+                st.rerun()
+        with mobile_profile_col:
+            if st.button("", key="mobile_profile_avatar_btn", help="Open profile menu"):
+                if st.session_state.get("show_profile_editor", False):
+                    st.session_state["show_profile_editor"] = False
+                    st.session_state["show_profile_menu"] = False
+                else:
+                    st.session_state["show_profile_menu"] = not st.session_state.get(
+                        "show_profile_menu", False
+                    )
+                st.rerun()
 
-            st.rerun()
-
-        # Render dropdown overlay card when menu is shown
-        if st.session_state.get("show_profile_menu"):
-
-            if st.button("✏️ Edit Profile", key="edit_profile_btn"):
+    if st.session_state.get("show_mobile_nav", False):
+        with st.container(key="edupredict_mobile_menu"):
+            if st.button("Dashboard", key="mobile_nav_dashboard"):
+                go_to_page("dashboard")
+            if st.button("Performance History", key="mobile_nav_performance"):
+                go_to_page("performance")
+            if st.button("Analytics Dashboard", key="mobile_nav_analytics"):
+                go_to_page("analytics")
+            if st.button("Study Material", key="mobile_nav_study"):
+                go_to_page("study")
+            if st.button("Predict Score", key="mobile_nav_predictor"):
+                go_to_page("predictor")
+            if st.button("Profile", key="mobile_nav_profile"):
                 st.session_state["show_profile_editor"] = True
                 st.session_state["show_profile_menu"] = False
+                st.session_state["show_mobile_nav"] = False
                 st.rerun()
 
-            if st.button("Logout", key="profile_logout"):
-                st.session_state.clear()
-                st.session_state["page"] = "login"
-                st.rerun()
+    # Render dropdown overlay card when menu is shown
+    if st.session_state.get("show_profile_menu"):
 
-    # Add spacer columns between the four main nav buttons to increase horizontal gaps
-    left_space, col1, gap1, col2, gap2, col3, gap3, col4, right_space = st.columns(
-        [2, 3, 1.5, 3, 1.5, 3, 1.5, 3, 2]
-    )
-    with col1:
-        if st.button("Performance History", key="nav_performance"):
-            st.session_state["current_page"] = "performance"
+        if st.button("✏️ Edit Profile", key="edit_profile_btn"):
+            st.session_state["show_profile_editor"] = True
+            st.session_state["show_profile_menu"] = False
             st.rerun()
-    with col2:
-        if st.button("Study Material", key="nav_study"):
-            st.session_state["current_page"] = "study"
-            st.rerun()
-    with col3:
-        if st.button("Predict Score", key="nav_predictor"):
-            st.session_state["current_page"] = "predictor"
-            st.rerun()
-    with col4:
-        if st.button("Analytics Dashboard", key="nav_analytics"):
-            st.session_state["current_page"] = "analytics"
+
+        if st.button("Logout", key="profile_logout"):
+            st.session_state.clear()
+            st.session_state["page"] = "login"
             st.rerun()
 
 def display_dashboard(username):
@@ -2729,4 +2815,3 @@ else:
             </p>
         </div>
         """, unsafe_allow_html=True)
-        
