@@ -828,14 +828,19 @@ def create_navigation():
         with st.container(key="edupredict_mobile_menu"):
             if st.button("Dashboard", key="mobile_nav_dashboard"):
                 go_to_page("dashboard")
+                st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Performance History", key="mobile_nav_performance"):
                 go_to_page("performance")
+                st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Analytics Dashboard", key="mobile_nav_analytics"):
                 go_to_page("analytics")
+                st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Study Material", key="mobile_nav_study"):
                 go_to_page("study")
+                st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Predict Score", key="mobile_nav_predictor"):
                 go_to_page("predictor")
+                st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Profile", key="mobile_nav_profile"):
                 st.session_state["show_profile_editor"] = True
                 st.session_state["show_profile_menu"] = False
