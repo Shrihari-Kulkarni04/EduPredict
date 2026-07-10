@@ -706,7 +706,7 @@ def create_navigation():
 
         # ---------- BOTTOM ROW ----------
         left_space, c1, c2, c3, c4, c5, right_space = st.columns(
-            [1.5, 3, 3, 3, 3, 3, 1.5]
+            [1.5, 4, 4, 4, 4, 4, 1.5]
         )
 
         with c1:
