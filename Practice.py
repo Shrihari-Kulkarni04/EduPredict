@@ -209,6 +209,122 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.markdown(
+    """
+    <style>
+        @media (max-width: 1024px) {
+            .stApp,
+            [data-testid="stAppViewContainer"] {
+                overflow-x: hidden !important;
+            }
+            [data-testid="stPlotlyChart"],
+            [data-testid="stDataFrame"] {
+                max-width: 100% !important;
+                overflow-x: auto !important;
+            }
+            iframe,
+            img,
+            svg,
+            canvas {
+                max-width: 100% !important;
+            }
+            div[style] {
+                box-sizing: border-box !important;
+                max-width: 100% !important;
+                overflow-wrap: break-word !important;
+            }
+            .study-page-wrap,
+            .study-hero-card,
+            .study-section-card,
+            .study-tip-card,
+            .study-viewer-card {
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            [data-testid="column"] {
+                width: 100% !important;
+                min-width: 100% !important;
+                flex: 1 1 100% !important;
+            }
+            .stButton > button {
+                width: 100% !important;
+                white-space: normal !important;
+            }
+            .stTextInput input,
+            .stTextArea textarea,
+            .stNumberInput input,
+            .stSelectbox,
+            .stFileUploader,
+            [data-testid="stForm"] {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .study-page-wrap {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+            .study-hero-card,
+            .study-section-card,
+            .study-tip-card {
+                padding: 20px !important;
+            }
+            .study-open-btn {
+                width: 100% !important;
+                text-align: center !important;
+                box-sizing: border-box !important;
+            }
+            .study-subject-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .st-key-profile_avatar_btn {
+                justify-content: flex-end !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            [data-testid="block-container"] {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            h1 {
+                line-height: 1.2 !important;
+                overflow-wrap: break-word !important;
+            }
+            h2,
+            h3,
+            p,
+            label {
+                overflow-wrap: break-word !important;
+            }
+            [data-testid="stMetric"] {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            [data-testid="block-container"] {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            .study-hero-card,
+            .study-section-card,
+            .study-tip-card {
+                padding: 16px !important;
+            }
+            .study-icon {
+                width: 56px !important;
+                height: 56px !important;
+                font-size: 28px !important;
+            }
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 def get_user_initials(user):
     if not user:
         return "U"
@@ -1581,6 +1697,10 @@ def display_dashboard_page():
                     overflow:hidden;
                     box-shadow:0 6px 18px rgba(0,0,0,.08);
                 }
+                .score-table-scroll{
+                    width:100%;
+                    overflow-x:auto;
+                }
 
                 tbody tr:last-child td{
                     border-bottom:1px solid #D1D5DB;
@@ -1629,11 +1749,22 @@ def display_dashboard_page():
                     background:#EEF4FF;
                 }
 
+                @media (max-width:600px){
+                    table{
+                        min-width:520px;
+                    }
+                    th,
+                    td{
+                        white-space:nowrap;
+                    }
+                }
+
                 </style>
                 </head>
 
                 <body>
 
+                <div class="score-table-scroll">
                 <table>
 
                 <thead>
