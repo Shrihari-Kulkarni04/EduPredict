@@ -834,7 +834,7 @@ def create_navigation():
                 st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Analytics Dashboard", key="mobile_nav_analytics"):
                 go_to_page("analytics")
-                st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Study Material", key="mobile_nav_study"):
                 go_to_page("study")
                 st.markdown("<br>", unsafe_allow_html=True)
