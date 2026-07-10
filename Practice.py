@@ -705,7 +705,9 @@ def create_navigation():
         st.markdown("<br><br>", unsafe_allow_html=True)
 
         # ---------- BOTTOM ROW ----------
-        c1, c2, c3, c4, c5 = st.columns(5)
+        left_space, c1, c2, c3, c4, c5, right_space = st.columns(
+            [1.5, 1, 1, 1, 1, 1, 1.5]
+        )
 
         with c1:
             if st.button("Dashboard", key="nav_dashboard"):
