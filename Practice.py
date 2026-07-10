@@ -2131,17 +2131,17 @@ def display_dashboard_page():
                         """, unsafe_allow_html=True)
 
         valid_predictions = [
-    pred
-    for pred in st.session_state["predictions"].values()
-    if isinstance(pred, (int, float))
-]
+            pred
+            for pred in st.session_state["predictions"].values()
+            if isinstance(pred, (int, float))
+        ]
 
-    if valid_predictions:
+        if valid_predictions:
 
-        avg_prediction = round(
-            sum(valid_predictions) / len(valid_predictions),
-            2,
-        )
+            avg_prediction = round(
+                sum(valid_predictions) / len(valid_predictions),
+                2,
+            )
 
         st.markdown(f"""
     <div style="display:flex; gap:20px; margin-top:15px;">
