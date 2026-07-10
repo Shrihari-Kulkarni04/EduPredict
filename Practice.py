@@ -1721,126 +1721,179 @@ def display_dashboard_page():
         user = st.session_state.get("user")
         if user:
             class_grade = user.get("class_grade", "")
-            
+
+            drive_link = ""
+            material_title = f"Class {class_grade} Study Material"
+            available_subjects = []
+
             if class_grade == "12 Science":
-                st.info("Redirecting to Class 12 Science Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 12 Science Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1vz83zfD-BZa5JQ_kzH0sR7IR6d9gZciZ" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1vz83zfD-BZa5JQ_kzH0sR7IR6d9gZciZ"
+                material_title = "Class 12 Science Study Material"
+                available_subjects = ["Physics", "Chemistry", "Mathematics", "Biology", "English", "Computer Science"]
             elif class_grade == "11 Science":
-                st.info("Redirecting to Class 11 Science Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 11 Science Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1L2gGlZGXgLyRbIrX8VmmUxOGavSoZ14b" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1L2gGlZGXgLyRbIrX8VmmUxOGavSoZ14b"
+                material_title = "Class 11 Science Study Material"
+                available_subjects = ["Physics", "Chemistry", "Mathematics", "Biology", "English"]
             elif class_grade == "11 Commerce":
-                st.info("Redirecting to Class 11 Commerce Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 11 Commerce Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1eDugXGA7xhEu2ntPeD9YBEoA8ZjmC2E6" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1eDugXGA7xhEu2ntPeD9YBEoA8ZjmC2E6"
+                material_title = "Class 11 Commerce Study Material"
+                available_subjects = ["Business Studies", "Accountancy", "Economics", "Mathematics", "English", "Information Technology"]
             elif class_grade == "10":
-                st.info("Redirecting to Class 10 Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 10 Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1vNF3k7N2mO4p99F0qxe-FRG3P4d2ncEm" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1vNF3k7N2mO4p99F0qxe-FRG3P4d2ncEm"
+                material_title = "Class 10 Study Material"
+                available_subjects = ["Mathematics", "Science", "English", "Social Science"]
             elif class_grade == "9":
-                st.info("Redirecting to Class 9 Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 9 Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1irw_9irQa-gNa96NDp8bHtiMVS24XFL1" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1irw_9irQa-gNa96NDp8bHtiMVS24XFL1"
+                material_title = "Class 9 Study Material"
+                available_subjects = ["Mathematics", "Science", "English", "Social Science", "Hindi"]
             elif class_grade == "8":
-                st.info("Redirecting to Class 8 Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 8 Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1PJrhYf3o7l4HIMtb2Efttm26aUsMLCpL" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1PJrhYf3o7l4HIMtb2Efttm26aUsMLCpL"
+                material_title = "Class 8 Study Material"
+                available_subjects = ["Mathematics", "Science", "English", "Social Science", "Hindi"]
             elif class_grade == "7":
-                st.info("Redirecting to Class 7 Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 7 Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1psTVTOizf2ooZL3nrniJPVKuD9VtyXTx" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1psTVTOizf2ooZL3nrniJPVKuD9VtyXTx"
+                material_title = "Class 7 Study Material"
+                available_subjects = ["Mathematics", "Science", "English", "Social Science", "Hindi"]
             elif class_grade == "6":
-                st.info("Redirecting to Class 6 Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 6 Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1XK_mZLmVLv3AI3Bl7woOJvKwgkm2u6Hr" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1XK_mZLmVLv3AI3Bl7woOJvKwgkm2u6Hr"
+                material_title = "Class 6 Study Material"
+                available_subjects = ["Mathematics", "Science", "English", "Social Science", "Hindi"]
             elif class_grade == "12 Commerce":
-                st.info("Redirecting to Class 12 Commerce Study Material...")
-                st.markdown("""
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>Class 12 Commerce Study Material</h3>
-                        <p>Click the button below to access your study material:</p>
-                        <a href="https://drive.google.com/drive/folders/1HetMbC0geyHfH35pcVyBWwdN_G1LouEv" target="_blank">
-                            <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                Access Study Material
-                            </button>
-                        </a>
-                    </div>
-                """, unsafe_allow_html=True)
+                drive_link = "https://drive.google.com/drive/folders/1HetMbC0geyHfH35pcVyBWwdN_G1LouEv"
+                material_title = "Class 12 Commerce Study Material"
+                available_subjects = ["Business Studies", "Accountancy", "Economics", "Mathematics", "English", "Information Technology"]
             else:
                 st.info(f"Study material for Class {class_grade} will be available soon!")
+
+            if drive_link:
+                safe_title = html.escape(material_title)
+                safe_drive_link = html.escape(drive_link, quote=True)
+                subject_items = "".join(
+                    f"<div class='study-subject-item'><span>&#10004;</span>{html.escape(subject)}</div>"
+                    for subject in available_subjects
+                )
+
+                st.markdown(f"""
+                    <style>
+                        .study-page-wrap {{
+                            max-width: 980px;
+                            margin: 0 auto;
+                            padding: 10px 16px 34px;
+                        }}
+                        .study-hero-card {{
+                            background: #ffffff;
+                            border: 1px solid #e5e7eb;
+                            border-radius: 18px;
+                            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+                            padding: 34px 30px;
+                            text-align: center;
+                        }}
+                        .study-icon {{
+                            width: 72px;
+                            height: 72px;
+                            margin: 0 auto 16px;
+                            border-radius: 20px;
+                            background: #ecfdf5;
+                            color: #16a34a;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 34px;
+                        }}
+                        .study-hero-card h2 {{
+                            margin: 0;
+                            color: #111827;
+                            font-size: 30px;
+                            font-weight: 800;
+                        }}
+                        .study-hero-card p {{
+                            margin: 12px auto 24px;
+                            max-width: 560px;
+                            color: #6b7280;
+                            font-size: 16px;
+                            line-height: 1.6;
+                        }}
+                        .study-open-btn {{
+                            display: inline-block;
+                            background: #16a34a;
+                            color: #ffffff !important;
+                            padding: 14px 28px;
+                            border-radius: 12px;
+                            font-size: 17px;
+                            font-weight: 700;
+                            text-decoration: none !important;
+                            box-shadow: 0 10px 20px rgba(22, 163, 74, 0.24);
+                        }}
+                        .study-section-card {{
+                            margin-top: 24px;
+                            background: #ffffff;
+                            border: 1px solid #e5e7eb;
+                            border-radius: 16px;
+                            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+                            padding: 24px;
+                        }}
+                        .study-section-card h3 {{
+                            margin: 0 0 18px;
+                            color: #111827;
+                            font-size: 22px;
+                            font-weight: 800;
+                        }}
+                        .study-subject-grid {{
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+                            gap: 12px;
+                        }}
+                        .study-subject-item {{
+                            background: #f9fafb;
+                            border: 1px solid #eef2f7;
+                            border-radius: 12px;
+                            padding: 12px 14px;
+                            color: #374151;
+                            font-size: 15px;
+                            font-weight: 600;
+                        }}
+                        .study-subject-item span {{
+                            color: #16a34a;
+                            font-weight: 800;
+                            margin-right: 8px;
+                        }}
+                        .study-tip-card {{
+                            margin-top: 24px;
+                            background: #fefce8;
+                            border: 1px solid #fde68a;
+                            border-radius: 16px;
+                            padding: 18px 20px;
+                            color: #713f12;
+                            box-shadow: 0 8px 18px rgba(113, 63, 18, 0.08);
+                        }}
+                        .study-tip-card strong {{
+                            display: block;
+                            margin-bottom: 6px;
+                            color: #854d0e;
+                            font-size: 17px;
+                        }}
+                    </style>
+                    <div class="study-page-wrap">
+                        <div class="study-hero-card">
+                            <div class="study-icon">&#128218;</div>
+                            <h2>{safe_title}</h2>
+                            <p>Access all your organized study notes from one place.</p>
+                            <a class="study-open-btn" href="{safe_drive_link}" target="_blank" rel="noopener">
+                                &#128194; Open Study Material
+                            </a>
+                        </div>
+                        <div class="study-section-card">
+                            <h3>Available Subjects</h3>
+                            <div class="study-subject-grid">
+                                {subject_items}
+                            </div>
+                        </div>
+                        <div class="study-tip-card">
+                            <strong>&#128161; Study Tip</strong>
+                            Revise these notes regularly to improve your academic performance.
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
     elif st.session_state["current_page"] == "predictor":
         st.title("Predict Score")
         
