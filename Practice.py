@@ -778,7 +778,7 @@ def create_navigation():
                 go_to_page("dashboard")
 
         with c2:
-            if st.button("Performance", key="nav_performance"):
+            if st.button("Performance History", key="nav_performance"):
                 go_to_page("performance")
 
         with c3:
