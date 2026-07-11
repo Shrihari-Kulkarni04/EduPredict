@@ -216,6 +216,13 @@ st.markdown(
 st.markdown(
     """
     <style>
+        .st-key-mobile_guest_topbar,
+        .st-key-mobile_auth_drawer,
+        .st-key-mobile_profile_drawer,
+        .st-key-mobile_drawer_backdrop {
+            display: none;
+        }
+
         @media (max-width: 1024px) {
             .stApp,
             [data-testid="stAppViewContainer"] {
@@ -290,6 +297,75 @@ st.markdown(
                 align-items:center;
                 height:100%;
             }
+            .st-key-desktop_auth_panel {
+                display: none !important;
+            }
+            .st-key-mobile_guest_topbar {
+                display: block !important;
+                position: sticky;
+                top: 0;
+                z-index: 9000;
+                margin-bottom: 12px;
+            }
+            .st-key-mobile_guest_topbar [data-testid="stHorizontalBlock"] {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+            }
+            .st-key-mobile_guest_topbar [data-testid="column"] {
+                width: auto !important;
+                min-width: 0 !important;
+                flex: 0 0 auto !important;
+            }
+            .st-key-mobile_guest_topbar [data-testid="column"]:first-child {
+                flex: 1 1 auto !important;
+            }
+            .st-key-mobile_guest_topbar .stButton > button {
+                width: auto !important;
+                min-width: 96px !important;
+            }
+            .st-key-mobile_drawer_backdrop {
+                display: block !important;
+                position: fixed;
+                inset: 0;
+                z-index: 10000;
+                background: rgba(17, 24, 39, 0.35);
+            }
+            .st-key-mobile_drawer_backdrop .stButton,
+            .st-key-mobile_drawer_backdrop .stButton > button {
+                position: absolute;
+                inset: 0;
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 100% !important;
+                padding: 0 !important;
+                border: 0 !important;
+                border-radius: 0 !important;
+                background: transparent !important;
+                color: transparent !important;
+                box-shadow: none !important;
+            }
+            .st-key-mobile_auth_drawer,
+            .st-key-mobile_profile_drawer {
+                display: block !important;
+                position: fixed;
+                top: 0;
+                right: 0;
+                z-index: 10001;
+                width: min(92vw, 390px);
+                height: 100vh;
+                overflow-y: auto;
+                background: #ffffff;
+                padding: 22px 18px;
+                box-shadow: -14px 0 35px rgba(0,0,0,0.22);
+                animation: mobileDrawerSlideIn 0.22s ease-out;
+            }
+            .st-key-mobile_auth_drawer [data-testid="column"],
+            .st-key-mobile_profile_drawer [data-testid="column"] {
+                width: 100% !important;
+                min-width: 100% !important;
+                flex: 1 1 100% !important;
+            }
         }
 
         @media (max-width: 600px) {
@@ -326,6 +402,24 @@ st.markdown(
                 width: 56px !important;
                 height: 56px !important;
                 font-size: 28px !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .st-key-mobile_guest_topbar,
+            .st-key-mobile_auth_drawer,
+            .st-key-mobile_profile_drawer,
+            .st-key-mobile_drawer_backdrop {
+                display: none !important;
+            }
+        }
+
+        @keyframes mobileDrawerSlideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
             }
         }
     </style>
@@ -579,6 +673,253 @@ def render_profile_editor(user):
         st.session_state.pop("username", None)
         st.rerun()
 
+def render_mobile_drawer_backdrop(close_state_key, button_key):
+    with st.container(key="mobile_drawer_backdrop"):
+        if st.button("Close drawer", key=button_key):
+            st.session_state[close_state_key] = False
+            st.rerun()
+
+def render_auth_form(key_prefix="", close_drawer_on_success=False):
+
+    def widget_key(name):
+        return f"{key_prefix}_{name}" if key_prefix else name
+
+    def prefixed_text_input(label, name, **kwargs):
+        if key_prefix:
+            kwargs["key"] = widget_key(name)
+        return st.text_input(label, **kwargs)
+
+    def prefixed_selectbox(label, name, options):
+        if key_prefix:
+            return st.selectbox(label, options, key=widget_key(name))
+        return st.selectbox(label, options)
+
+    def prefixed_button(label, name=None, **kwargs):
+        if key_prefix and name:
+            kwargs["key"] = widget_key(name)
+        return st.button(label, **kwargs)
+
+    if st.session_state["page"] == "login":
+        st.markdown("""
+        <div style="text-align:center; padding-bottom:18px;">
+            <h2 style="margin-bottom:8px; color:#111827; font-size:32px; font-weight:700;">
+                Welcome Back
+            </h2>
+            <p>
+                Sign in to continue your learning journey.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown("""
+            <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
+            𝓛𝓸𝓰𝓲𝓷
+
+        """,
+          unsafe_allow_html=True)
+        username = st.text_input(
+            "Username",
+            placeholder="Enter your username",
+            key=widget_key("login_username")
+        )
+
+        password = st.text_input(
+            "Password",
+            type="password",
+            placeholder="Enter your password",
+            key=widget_key("login_password")
+        )
+
+        col_login, col_signup = st.columns(2)
+
+        with col_login:
+            if prefixed_button("🚀 Login", "login_submit", use_container_width=True):
+
+                if not username.strip():
+                    st.error("Please enter your username.")
+
+                elif not password:
+                    st.error("Please enter your password.")
+
+                else:
+                    user = users_collection.find_one(
+                        {"username": username.strip()}
+                    )
+
+                    if not user:
+                        st.error("Username does not exist.")
+
+                    elif not verify_password(password, user["password"]):
+                        st.error("Incorrect password.")
+
+                    else:
+                        st.session_state["page"] = "dashboard"
+                        st.session_state["username"] = username.strip()
+                        st.session_state["user"] = user
+                        if close_drawer_on_success:
+                            st.session_state["show_mobile_auth_drawer"] = False
+                        st.rerun()
+
+        with col_signup:
+            if prefixed_button("Create Account", "create_account", use_container_width=True):
+                st.session_state["page"] = "signup"
+                if key_prefix:
+                    st.session_state["show_mobile_auth_drawer"] = True
+                st.rerun()
+
+    elif st.session_state["page"] == "signup":
+
+        st.markdown("""
+            <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
+            𝓢𝓲𝓰𝓷 𝓤𝓹
+
+        """,
+          unsafe_allow_html=True)
+
+        full_name = prefixed_text_input("Full Name", "signup_full_name")
+        username = prefixed_text_input("Username", "signup_username")
+        class_grade = prefixed_selectbox("Class", "signup_class", GRADE_OPTIONS)
+        password = prefixed_text_input("Password", "signup_password", type="password")
+        confirm_password = prefixed_text_input("Confirm Password", "signup_confirm_password", type="password")
+
+        if password != confirm_password:
+            st.error("Passwords do not match.")
+        col_create, col_back = st.columns(2)
+
+        with col_create:
+            if prefixed_button("Sign Up", "signup_submit", use_container_width=True):
+
+                username_error = validate_username(username)
+                password_error = validate_password(password)
+
+                if not full_name.strip():
+                    st.error("Full name cannot be empty.")
+
+                elif username_error:
+                    st.error(username_error)
+
+                elif password != confirm_password:
+                    st.error("Passwords do not match.")
+
+                elif password_error:
+                    st.error(password_error)
+
+                elif users_collection.find_one({"username": username.strip()}):
+                    st.error("Username already exists.")
+
+                else:
+                    users_collection.insert_one({
+                        "full_name": full_name.strip(),
+                        "username": username.strip(),
+                        "class_grade": class_grade,
+                        "password": hash_password(password),
+                        "createdAt": datetime.now(UTC)
+                    })
+
+                    # Fetch the newly created user
+                    new_user = users_collection.find_one({"username": username.strip()})
+
+                    st.success("Account created successfully!")
+
+                    st.session_state["username"] = username.strip()
+                    st.session_state["page"] = "dashboard"
+                    if close_drawer_on_success:
+                        st.session_state["show_mobile_auth_drawer"] = False
+
+                    st.rerun()
+
+        with col_back:
+            if prefixed_button("Back to Login", "back_to_login"):
+                st.session_state["page"] = "login"
+                if key_prefix:
+                    st.session_state["show_mobile_auth_drawer"] = True
+                st.rerun()
+
+def render_mobile_guest_topbar():
+    if "show_mobile_auth_drawer" not in st.session_state:
+        st.session_state["show_mobile_auth_drawer"] = False
+
+    with st.container(key="mobile_guest_topbar"):
+        mobile_guest_left, mobile_guest_right = st.columns([5, 1])
+
+        with mobile_guest_right:
+            if st.button("Login", key="mobile_guest_login_btn"):
+                st.session_state["page"] = "login"
+                st.session_state["show_mobile_auth_drawer"] = True
+                st.rerun()
+
+def render_mobile_auth_drawer():
+    if not st.session_state.get("show_mobile_auth_drawer", False):
+        return
+
+    render_mobile_drawer_backdrop("show_mobile_auth_drawer", "mobile_auth_drawer_backdrop_close")
+
+    with st.container(key="mobile_auth_drawer"):
+        if st.button("Close", key="mobile_auth_drawer_close", use_container_width=True):
+            st.session_state["show_mobile_auth_drawer"] = False
+            st.rerun()
+
+        render_auth_form(key_prefix="mobile_auth", close_drawer_on_success=True)
+
+def render_mobile_profile_drawer(user):
+    if not st.session_state.get("show_mobile_profile_drawer", False):
+        return
+
+    render_mobile_drawer_backdrop("show_mobile_profile_drawer", "mobile_profile_drawer_backdrop_close")
+
+    profile_src = html.escape(get_profile_picture_src(user), quote=True)
+    safe_name = html.escape(user.get("full_name", "User")) if user else "User"
+    safe_username = html.escape(user.get("username", "")) if user else ""
+    safe_class = html.escape(user.get("class_grade", "")) if user else ""
+
+    with st.container(key="mobile_profile_drawer"):
+        if st.button("Close", key="mobile_profile_drawer_close", use_container_width=True):
+            st.session_state["show_mobile_profile_drawer"] = False
+            st.rerun()
+
+        st.markdown(
+            f"""
+            <div style="
+                padding:8px 0 18px;
+                border-bottom:1px solid #e5e7eb;
+                margin-bottom:18px;
+            ">
+                <img src="{profile_src}" style="
+                    width:72px;
+                    height:72px;
+                    border-radius:50%;
+                    object-fit:cover;
+                    border:3px solid #2563EB;
+                    margin-bottom:12px;
+                ">
+                <h3 style="margin:0;color:#111827;">{safe_name}</h3>
+                <p style="margin:6px 0;color:#6B7280;">@{safe_username}</p>
+                <span style="
+                    display:inline-block;
+                    background:#EEF2FF;
+                    color:#2563EB;
+                    padding:6px 12px;
+                    border-radius:20px;
+                    font-size:13px;
+                    font-weight:600;
+                ">
+                    Class {safe_class}
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        if st.button("✏️ Edit Profile", key="mobile_profile_drawer_edit", use_container_width=True):
+            st.session_state["show_profile_editor"] = True
+            st.session_state["show_profile_menu"] = False
+            st.session_state["show_mobile_profile_drawer"] = False
+            st.rerun()
+
+        if st.button("🚪 Logout", key="mobile_profile_drawer_logout", use_container_width=True):
+            st.session_state.clear()
+            st.session_state["page"] = "login"
+            st.rerun()
+
 def create_navigation():
 
     user = st.session_state.get("user")
@@ -590,6 +931,8 @@ def create_navigation():
         st.session_state["show_profile_menu"] = False
     if "show_mobile_nav" not in st.session_state:
         st.session_state["show_mobile_nav"] = False
+    if "show_mobile_profile_drawer" not in st.session_state:
+        st.session_state["show_mobile_profile_drawer"] = False
 
     st.markdown(
         f"""
@@ -803,26 +1146,10 @@ def create_navigation():
         with mobile_profile_col:
             with st.container(key="mobile_profile_menu_anchor"):
                 if st.button("", key="mobile_profile_avatar_btn", help="Open profile menu"):
-                    if st.session_state.get("show_profile_editor", False):
-                        st.session_state["show_profile_editor"] = False
-                        st.session_state["show_profile_menu"] = False
-                    else:
-                        st.session_state["show_profile_menu"] = not st.session_state.get(
-                            "show_profile_menu", False
-                        )
+                    st.session_state["show_mobile_profile_drawer"] = True
+                    st.session_state["show_mobile_nav"] = False
+                    st.session_state["show_profile_menu"] = False
                     st.rerun()
-
-                if st.session_state.get("show_profile_menu"):
-                    with st.container(key="mobile_profile_dropdown_menu"):
-                        if st.button("✏️ Edit Profile", key="mobile_profile_dropdown_edit"):
-                            st.session_state["show_profile_editor"] = True
-                            st.session_state["show_profile_menu"] = False
-                            st.rerun()
-
-                        if st.button("🚪 Logout", key="mobile_profile_dropdown_logout"):
-                            st.session_state.clear()
-                            st.session_state["page"] = "login"
-                            st.rerun()
 
     if st.session_state.get("show_mobile_nav", False):
         with st.container(key="edupredict_mobile_menu"):
@@ -842,10 +1169,12 @@ def create_navigation():
                 go_to_page("predictor")
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Profile", key="mobile_nav_profile"):
-                st.session_state["show_profile_editor"] = True
+                st.session_state["show_mobile_profile_drawer"] = True
                 st.session_state["show_profile_menu"] = False
                 st.session_state["show_mobile_nav"] = False
                 st.rerun()
+
+    render_mobile_profile_drawer(user)
 
     if st.session_state.get("show_profile_menu"):
         with st.container(key="profile_menu_close_control"):
@@ -2645,6 +2974,9 @@ if "page" not in st.session_state:
 if st.session_state["page"] == "dashboard":
     display_dashboard_page()
 else:
+    render_mobile_guest_topbar()
+    render_mobile_auth_drawer()
+
     # UI Layout - Two Vertical Parts
     col1, col2 = st.columns([2, 1])
 
@@ -2670,6 +3002,7 @@ else:
             use_container_width=True
         ):
             st.session_state["page"] = "signup"
+            st.session_state["show_mobile_auth_drawer"] = True
             st.rerun()
 
         st.markdown("<br>", unsafe_allow_html=True)
@@ -2793,151 +3126,26 @@ else:
 
     # Right Side - Login/Signup Form
     with col2:
-        st.markdown("""
-        <style>
-        .login-container {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0px 15px 35px rgba(0,0,0,0.12);
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        st.markdown("""
-        
-        """, unsafe_allow_html=True)
+        with st.container(key="desktop_auth_panel"):
+            st.markdown("""
+            <style>
+            .login-container {
+                background: white;
+                padding: 30px;
+                border-radius: 16px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0px 15px 35px rgba(0,0,0,0.12);
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            st.markdown("""
+            
+            """, unsafe_allow_html=True)
 
-        card = st.container()
+            card = st.container()
 
-        with card:
-        
-            if st.session_state["page"] == "login":
-                st.markdown("""
-                <div style="text-align:center; padding-bottom:18px;">
-                    <h2 style="margin-bottom:8px; color:#111827; font-size:32px; font-weight:700;">
-                        Welcome Back
-                    </h2>
-                    <p>
-                        Sign in to continue your learning journey.
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-                st.markdown("""
-                    <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
-                    𝓛𝓸𝓰𝓲𝓷
-
-                """,
-                  unsafe_allow_html=True)
-                username = st.text_input(
-                    "Username",
-                    placeholder="Enter your username",
-                    key="login_username"
-                )
-
-                password = st.text_input(
-                    "Password",
-                    type="password",
-                    placeholder="Enter your password",
-                    key="login_password"
-                )
-                
-                col_login, col_signup = st.columns(2)
-                
-                with col_login:
-                    if st.button("🚀 Login", use_container_width=True):
-
-                        if not username.strip():
-                            st.error("Please enter your username.")
-
-                        elif not password:
-                            st.error("Please enter your password.")
-
-                        else:
-                            user = users_collection.find_one(
-                                {"username": username.strip()}
-                            )
-
-                            if not user:
-                                st.error("Username does not exist.")
-
-                            elif not verify_password(password, user["password"]):
-                                st.error("Incorrect password.")
-
-                            else:
-                                st.session_state["page"] = "dashboard"
-                                st.session_state["username"] = username.strip()
-                                st.session_state["user"] = user
-                                st.rerun()
-                
-                with col_signup:
-                   if st.button("Create Account", use_container_width=True):
-                    st.session_state["page"] = "signup"
-                    st.rerun()
-
-            elif st.session_state["page"] == "signup":
-
-                st.markdown("""
-                    <div style="text-align:center; padding:5px; color:#000000; font-style:bold; font-size:30px;">
-                    𝓢𝓲𝓰𝓷 𝓤𝓹
-
-                """,
-                  unsafe_allow_html=True)
-
-                full_name = st.text_input("Full Name")
-                username = st.text_input("Username")
-                class_grade = st.selectbox("Class", GRADE_OPTIONS)
-                password = st.text_input("Password", type="password")
-                confirm_password = st.text_input("Confirm Password", type="password")
-
-                if password != confirm_password:
-                    st.error("Passwords do not match.")
-                col_create, col_back = st.columns(2)
-
-                with col_create:
-                    if st.button("Sign Up", use_container_width=True):
-
-                        username_error = validate_username(username)
-                        password_error = validate_password(password)
-
-                        if not full_name.strip():
-                            st.error("Full name cannot be empty.")
-
-                        elif username_error:
-                            st.error(username_error)
-
-                        elif password != confirm_password:
-                            st.error("Passwords do not match.")
-
-                        elif password_error:
-                            st.error(password_error)
-
-                        elif users_collection.find_one({"username": username.strip()}):
-                            st.error("Username already exists.")
-
-                        else:
-                            users_collection.insert_one({
-                                "full_name": full_name.strip(),
-                                "username": username.strip(),
-                                "class_grade": class_grade,
-                                "password": hash_password(password),
-                                "createdAt": datetime.now(UTC)
-                            })
-
-                            # Fetch the newly created user
-                            new_user = users_collection.find_one({"username": username.strip()})
-
-                            st.success("Account created successfully!")
-
-                            st.session_state["username"] = username.strip()
-                            st.session_state["page"] = "dashboard"
-
-                            st.rerun()
-
-                with col_back:
-                    if st.button("Back to Login"):
-                        st.session_state["page"] = "login"
-                        st.rerun()
+            with card:
+                render_auth_form()
             
     st.markdown("---")
 
