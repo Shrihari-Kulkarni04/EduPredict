@@ -75,7 +75,6 @@ AI-powered student performance prediction platform built using Streamlit, MongoD
 
 ---
 
----
 
 # 📷 Application Preview
 
