@@ -122,7 +122,7 @@ AI-powered student performance prediction platform built using Streamlit, MongoD
 
 ### Profile Management
 
-![](assets/screenshots/profile-management.png)
+![](assets/screenshots/profile_management.png)
 
 ---
 
