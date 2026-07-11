@@ -839,10 +839,27 @@ def render_mobile_guest_topbar():
         st.session_state["show_mobile_auth_drawer"] = False
 
     with st.container(key="mobile_guest_topbar"):
-        mobile_guest_left, mobile_guest_right = st.columns([5, 1])
 
-        with mobile_guest_right:
-            if st.button("Login", key="mobile_guest_login_btn"):
+        st.markdown("""
+        <style>
+        .st-key-mobile_guest_topbar{
+            display:flex;
+            justify-content:flex-end;
+            width:100%;
+        }
+
+        .st-key-mobile_guest_topbar .stButton{
+            display:flex;
+            justify-content:flex-end;
+            width:100%;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        _, login_col = st.columns([6, 1])
+
+        with login_col:
+            if st.button("Login", key="mobile_guest_login_btn", use_container_width=True):
                 st.session_state["page"] = "login"
                 st.session_state["show_mobile_auth_drawer"] = True
                 st.rerun()
@@ -854,11 +871,12 @@ def render_mobile_auth_drawer():
     render_mobile_drawer_backdrop("show_mobile_auth_drawer", "mobile_auth_drawer_backdrop_close")
 
     with st.container(key="mobile_auth_drawer"):
-        if st.button("Close", key="mobile_auth_drawer_close", use_container_width=True):
-            st.session_state["show_mobile_auth_drawer"] = False
-            st.rerun()
+            st.markdown("<br><br>", unsafe_allow_html=True)            
+            if st.button("✖", key="close_mobile_drawer"):
+                st.session_state["show_mobile_auth_drawer"] = False
+                st.rerun()
 
-        render_auth_form(key_prefix="mobile_auth", close_drawer_on_success=True)
+            render_auth_form(key_prefix="mobile_auth", close_drawer_on_success=True)
 
 def render_mobile_profile_drawer(user):
     if not st.session_state.get("show_mobile_profile_drawer", False):
@@ -3164,7 +3182,7 @@ else:
     margin-bottom:8px;
     color:#111827;
     ">
-    🎓 EduPredict v1.0
+    EduPredict v1.0
     </h2>
 
     <p style="
