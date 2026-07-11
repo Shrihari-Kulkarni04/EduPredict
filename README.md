@@ -1,8 +1,30 @@
-# 🎓 EduPredict
+<p align="center">
+  <img src="assets/hero-banner.png" width="100%" alt="EduPredict Hero Banner">
+</p>
 
-**AI-Powered Personalized Learning Platform**
+<h1 align="center">🎓 EduPredict</h1>
 
-EduPredict is an intelligent educational platform designed to help students track their academic performance, predict future scores, and receive personalized learning recommendations. The platform combines data analytics, machine learning, and an interactive dashboard to create a smarter learning experience.
+<p align="center">
+<b>Learn Smarter. Predict Better.</b>
+</p>
+
+<p align="center">
+AI-powered student performance prediction platform built using Streamlit, MongoDB and Machine Learning.
+</p>
+
+<p align="center">
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white">
+<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white">
+<img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white">
+<img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white">
+<img src="https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white">
+</p>
+
+<p align="center">
+<a href="https://edupredict-qc6j.streamlit.app/">
+<img src="https://img.shields.io/badge/🚀%20Live%20Demo-Visit%20Now-2563EB?style=for-the-badge">
+</a>
+</p>
 
 ---
 
@@ -53,6 +75,58 @@ EduPredict is an intelligent educational platform designed to help students trac
 
 ---
 
+---
+
+# 📷 Application Preview
+
+## 💻 Desktop
+
+### Landing Page
+
+![](assets/screenshots/landing-page-desktop.png)
+
+### Dashboard
+
+![](assets/screenshots/dashboard-desktop.png)
+
+### Performance History
+
+![](assets/screenshots/performance-history.png)
+
+### Analytics Dashboard
+
+![](assets/screenshots/analytics-dashboard.png)
+
+### AI Prediction
+
+![](assets/screenshots/ai-prediction.png)
+
+### Study Material
+
+![](assets/screenshots/study-material.png)
+
+----
+
+## 📱 Mobile
+
+### Landing Page
+
+![](assets/screenshots/mobile-landing.png)
+
+### Dashboard
+
+![](assets/screenshots/mobile-dashboard.png)
+
+### Navigation
+
+![](assets/screenshots/mobile-navigation.png)
+
+### Profile Management
+
+![](assets/screenshots/profile-management.png)
+
+---
+
 ## 🛠️ Technology Stack
 
 ### Frontend
@@ -82,7 +156,7 @@ EduPredict is an intelligent educational platform designed to help students trac
 
 ---
 
-## 🎯 Key Objectives
+## 🎯 Why EduPredict?
 
 * Help students monitor academic progress.
 * Predict future examination performance.
@@ -92,7 +166,7 @@ EduPredict is an intelligent educational platform designed to help students trac
 
 ---
 
-## 📂 Project Modules
+## 🏗 System Architecture
 
 ### 1. Authentication Module
 
@@ -133,9 +207,10 @@ Offers a centralized interface for analytics, predictions, and profile managemen
 * Advanced Recommendation Engine
 * Email Notifications
 * Admin Dashboard
-* Performance Leaderboards
-* Enhanced AI Models
 * Learning Path Generation
+* Google Authentication
+* Two-Factor Authentication (2FA)
+* PDF Report Generation
 
 ---
 
@@ -143,6 +218,22 @@ Offers a centralized interface for analytics, predictions, and profile managemen
 
 **Shrihari H Kulkarni**
 
+Computer Science Engineering Student
+
+---
+
+⭐ If you found this project useful, consider giving it a star on GitHub.
+
+---
+
 EduPredict © 2026
 
 *"Learn Smarter. Predict Better."*
+
+----
+
+## 📄 License
+
+This project is intended for educational and portfolio purposes.
+
+© 2026 Shrihari H Kulkarni. All Rights Reserved.
