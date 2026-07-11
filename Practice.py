@@ -2212,10 +2212,6 @@ def display_dashboard_page():
             🚀 Start by clicking **Add Score** below.
             """)
             
-        if st.button("🚀 Go to Dashboard", use_container_width=True):
-            st.session_state["current_page"] = "dashboard"
-            st.rerun()
-            
         if user:
             # Display the bar chart with recent entries if scores exist
             if st.session_state["subject_scores"]:
