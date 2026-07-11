@@ -3163,82 +3163,82 @@ else:
             
     st.markdown("---")
 
-    st.markdown("""
-    <div style="
-    background:#ffffff;
-    border:1px solid #E5E7EB;
-    border-radius:18px;
-    padding:28px;
-    margin-top:40px;
-    text-align:center;
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-    ">
+st.markdown("""
+<div style="
+background:#ffffff;
+border:1px solid #E5E7EB;
+border-radius:18px;
+padding:28px;
+margin-top:40px;
+text-align:center;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+">
 
-    <h2 style="
-    margin-bottom:8px;
-    color:#111827;
-    ">
-    EduPredict v1.0
-    </h2>
+<h2 style="
+margin-bottom:8px;
+color:#111827;
+">
+EduPredict v1.0
+</h2>
 
-    <p style="
-    font-size:16px;
-    color:#6B7280;
-    margin-bottom:20px;
-    ">
-    AI-Powered Student Performance Prediction Platform
-    </p>
+<p style="
+font-size:16px;
+color:#6B7280;
+margin-bottom:20px;
+">
+AI-Powered Student Performance Prediction Platform
+</p>
 
-    <hr style="
-    border:none;
-    border-top:1px solid #E5E7EB;
-    margin:20px 0;
-    ">
+<hr style="
+border:none;
+border-top:1px solid #E5E7EB;
+margin:20px 0;
+">
 
-    <p style="
-    font-size:16px;
-    margin-bottom:8px;
-    color:#111827;
-    ">
-    Developed by <b>Shrihari H Kulkarni</b>
-    </p>
+<p style="
+font-size:16px;
+margin-bottom:8px;
+color:#111827;
+">
+Developed by <b>Shrihari H Kulkarni</b>
+</p>
 
-    <p style="
-    color:#6B7280;
-    font-size:15px;
-    margin-bottom:18px;
-    ">
-    Built using Python • Streamlit • MongoDB • Scikit-Learn • Plotly
-    </p>
+<p style="
+color:#6B7280;
+font-size:15px;
+margin-bottom:18px;
+">
+Built using Python • Streamlit • MongoDB • Scikit-Learn • Plotly
+</p>
 
-    <div style="
-    display:inline-block;
-    background:#EEF4FF;
-    padding:10px 18px;
-    border-radius:30px;
-    font-size:14px;
-    font-weight:600;
-    color:#2563EB;
-    margin-bottom:20px;
-    ">
-    🤖 AI predictions are generated for educational guidance only.
-    </div>
+<div style="
+display:inline-block;
+background:#EEF4FF;
+padding:10px 18px;
+border-radius:30px;
+font-size:14px;
+font-weight:600;
+color:#2563EB;
+margin-bottom:20px;
+">
+🤖 AI predictions are generated for educational guidance only.
+</div>
 
-    <p style="
-    font-size:14px;
-    color:#9CA3AF;
-    margin-top:20px;
-    ">
-    Version 1.0 • July 2026
-    </p>
+<p style="
+font-size:14px;
+color:#9CA3AF;
+margin-top:20px;
+">
+Version 1.0 • July 2026
+</p>
 
-    <p style="
-    font-size:13px;
-    color:#9CA3AF;
-    margin-top:8px;
-    ">
-    © 2026 EduPredict. All Rights Reserved.
-    </p>
+<p style="
+font-size:13px;
+color:#9CA3AF;
+margin-top:8px;
+">
+© 2026 EduPredict. All Rights Reserved.
+</p>
 
-    </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
